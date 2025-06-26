@@ -5,221 +5,247 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>INKSPIRE | Printing Shop Manager</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
     .hidden { display: none; }
     .active { font-weight: bold; }
+    /* Subtle transition for buttons */
+    button {
+      transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+    }
+    button:hover {
+      transform: translateY(-1px);
+    }
+    /* Custom focus style for inputs */
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #8B5CF6; /* purple-500 */
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2); /* purple-500 with opacity */
+    }
+    /* Style for date labels */
+    .date-label {
+        font-weight: 600; /* Semi-bold */
+        color: #6B21A8; /* A darker purple for emphasis */
+        margin-bottom: 0.5rem; /* Space below the label */
+        display: block; /* Ensures it takes full width */
+    }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-gray-50 text-gray-800">
 
-<!-- Login Screen -->
-<div id="login-screen" class="flex items-center justify-center h-screen bg-purple-600">
-  <div class="bg-white p-8 rounded shadow-md w-full max-w-sm">
-    <h2 class="text-2xl font-bold text-center text-purple-700 mb-6">INKSPIRE Login</h2>
-    <input id="username" type="text" placeholder="Username" class="w-full px-4 py-2 border mb-3 rounded"/>
-    <input id="password" type="password" placeholder="Password" class="w-full px-4 py-2 border mb-3 rounded"/>
-    <button onclick="login()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded">Login</button>
-    <p id="login-error" class="text-red-500 mt-4 text-center hidden">Invalid credentials. Try again.</p>
+<div id="login-screen" class="flex items-center justify-center h-screen bg-gradient-to-br from-purple-600 to-indigo-700">
+  <div class="bg-white p-10 rounded-xl shadow-2xl w-full max-w-sm transform transition-all duration-300 hover:scale-105">
+    <h2 class="text-3xl font-extrabold text-center text-purple-700 mb-8">INKSPIRE Login</h2>
+    <input id="username" type="text" placeholder="Username" class="w-full px-5 py-3 border border-gray-300 rounded-lg mb-4 focus:ring-purple-500 focus:border-purple-500"/>
+    <input id="password" type="password" placeholder="Password" class="w-full px-5 py-3 border border-gray-300 rounded-lg mb-6 focus:ring-purple-500 focus:border-purple-500"/>
+    <button onclick="login()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg">Login</button>
+    <p id="login-error" class="text-red-500 mt-5 text-center hidden">Invalid credentials. Try again.</p>
   </div>
 </div>
 
-<!-- Main App -->
 <div id="app" class="hidden flex h-screen">
-  <!-- Sidebar -->
-  <aside class="w-64 bg-white shadow-lg p-6 space-y-4">
-    <div class="text-2xl font-bold text-purple-700 mb-4">INKSPIRE</div>
-    <nav class="sidebar space-y-2">
-      <button onclick="showSection('dashboard')" id="dashboard-link" class="block text-left w-full">📊 Dashboard</button>
-      <button onclick="showSection('job-order')" class="block text-left w-full">📝 New Job Order</button>
-      <button onclick="showSection('calendar')" class="block text-left w-full">📅 Calendar</button>
-      <button onclick="showSection('tasks')" class="block text-left w-full">✅ Tasks</button>
-      <button onclick="showSection('earnings')" class="block text-left w-full">💰 Earnings</button>
-      <button onclick="showSection('expenses')" class="block text-left w-full">💸 Expenses</button>
-      <button onclick="showSection('reports')" class="block text-left w-full">📈 Reports</button>
-      <button onclick="logout()" class="block text-left w-full text-red-600">🚪 Logout</button>
-    </nav>
+  <aside class="w-64 bg-white shadow-xl p-6 space-y-6 flex flex-col justify-between">
+    <div>
+      <div class="text-3xl font-extrabold text-purple-700 mb-6 tracking-wide">INKSPIRE</div>
+      <nav class="sidebar space-y-3">
+        <button onclick="showSection('dashboard')" id="dashboard-link" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📊 Dashboard</button>
+        <button onclick="showSection('job-order')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📝 New Job Order</button>
+        <button onclick="showSection('calendar')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📅 Calendar</button>
+        <button onclick="showSection('tasks')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">✅ Tasks</button>
+        
+        <div class="border-t border-gray-200 my-3"></div> <button onclick="showSection('expenses')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">💸 Expenses</button>
+        <button onclick="showSection('earnings')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">💰 Earnings</button>
+        
+        <div class="border-t border-gray-200 my-3"></div> <button onclick="showSection('reports')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📈 Reports</button>
+      </nav>
+    </div>
+    <button onclick="logout()" class="block text-left w-full text-red-600 hover:text-red-800 py-2 px-3 rounded-lg bg-red-50 hover:bg-red-100 transition-colors duration-200 mt-auto">🚪 Logout</button>
   </aside>
 
-  <!-- Content Area -->
-  <main class="flex-1 p-6 space-y-10 overflow-y-auto">
-    <!-- Dashboard Section -->
-    <section id="dashboard" class="hidden">
-      <h2 class="text-xl font-semibold text-purple-700">📊 Dashboard</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-        <div class="bg-white p-4 shadow rounded text-center">
-          <p>Total Jobs</p><h3 class="text-2xl font-bold" id="stat-total">0</h3>
+  <main class="flex-1 p-8 space-y-10 overflow-y-auto bg-gray-100">
+    <section id="dashboard" class="hidden bg-white p-6 rounded-xl shadow-lg">
+      <h2 class="text-2xl font-bold text-purple-700 mb-6">📊 Dashboard</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
+        <div class="bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
+          <p class="text-gray-500 text-sm">Total Jobs</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-total">0</h3>
         </div>
-        <div class="bg-white p-4 shadow rounded text-center">
-          <p>In Progress</p><h3 class="text-2xl font-bold text-yellow-500" id="stat-progress">0</h3>
+        <div class="bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
+          <p class="text-gray-500 text-sm">In Progress</p><h3 class="text-3xl font-extrabold text-yellow-500 mt-1" id="stat-progress">0</h3>
         </div>
-        <div class="bg-white p-4 shadow rounded text-center">
-          <p>Completed</p><h3 class="text-2xl font-bold text-green-500" id="stat-completed">0</h3>
+        <div class="bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
+          <p class="text-gray-500 text-sm">Completed</p><h3 class="text-3xl font-extrabold text-green-600 mt-1" id="stat-completed">0</h3>
         </div>
-        <div class="bg-white p-4 shadow rounded text-center">
-          <p>Cancelled</p><h3 class="text-2xl font-bold text-red-500" id="stat-cancelled">0</h3>
+        <div class="bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
+          <p class="text-gray-500 text-sm">Cancelled</p><h3 class="text-3xl font-extrabold text-red-600 mt-1" id="stat-cancelled">0</h3>
         </div>
       </div>
     </section>
     
-        <!-- Job Order Section -->
-    <section id="job-order" class="hidden">
-      <h2 class="text-xl font-semibold text-purple-700">📝 New Job Order</h2>
-      <form id="job-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <input id="customer" type="text" required placeholder="Customer Name" class="p-2 border rounded" />
-        <input id="customer-phone" type="text" required placeholder="Phone Number" class="p-2 border rounded" />
+        <section id="job-order" class="hidden bg-white p-6 rounded-xl shadow-lg">
+      <h2 class="text-2xl font-bold text-purple-700 mb-6">📝 New Job Order</h2>
+      <form id="job-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <input id="customer" type="text" required placeholder="Customer Name" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
+        <input id="customer-phone" type="text" required placeholder="Phone Number" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
 
-        <fieldset class="md:col-span-2 border p-4 rounded">
-          <legend class="font-semibold mb-2">Job Details</legend>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-            <label><input type="checkbox" name="details" value="Scanning"> Scanning</label>
-            <label><input type="checkbox" name="details" value="Laminating"> Laminating</label>
-            <label><input type="checkbox" name="details" value="Fax"> Fax</label>
-            <label><input type="checkbox" name="details" value="Photocopy"> Photocopy</label>
-            <label><input type="checkbox" name="details" value="Business Card"> Business Card</label>
-            <label><input type="checkbox" name="details" value="Colour Printing"> Colour Printing</label>
-            <label><input type="checkbox" name="details" value="B&W Printing"> B&W Printing</label>
-            <label><input type="checkbox" name="details" value="Other"> Other</label>
+        <fieldset class="md:col-span-2 border border-gray-300 p-5 rounded-lg">
+          <legend class="font-semibold text-gray-700 mb-3">Job Details</legend>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Scanning" class="form-checkbox text-purple-600 rounded"> <span>Scanning</span></label>
+            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Laminating" class="form-checkbox text-purple-600 rounded"> <span>Laminating</span></label>
+            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Fax" class="form-checkbox text-purple-600 rounded"> <span>Fax</span></label>
+            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Photocopy" class="form-checkbox text-purple-600 rounded"> <span>Photocopy</span></label>
+            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Business Card" class="form-checkbox text-purple-600 rounded"> <span>Business Card</span></label>
+            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Colour Printing" class="form-checkbox text-purple-600 rounded"> <span>Colour Printing</span></label>
+            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="B&W Printing" class="form-checkbox text-purple-600 rounded"> <span>B&W Printing</span></label>
+            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Other" class="form-checkbox text-purple-600 rounded"> <span>Other</span></label>
           </div>
-          <textarea id="other-details" placeholder="Other details..." class="w-full mt-2 p-2 border rounded"></textarea>
+          <textarea id="other-details" placeholder="Other details..." class="w-full mt-4 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"></textarea>
         </fieldset>
 
-        <input id="price" type="number" required placeholder="Price (Rs)" class="p-2 border rounded" />
-        <input id="discount" type="number" required placeholder="Discount (Rs)" class="p-2 border rounded" />
-        <p class="md:col-span-2 font-semibold text-purple-700">Total: <span id="total-display">Rs. 0.00</span></p>
+        <input id="price" type="number" required placeholder="Price (Rs)" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
+        <input id="discount" type="number" required placeholder="Discount (Rs)" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
+        <p class="md:col-span-2 text-xl font-bold text-purple-700">Total: <span id="total-display">Rs. 0.00</span></p>
 
-        <input id="order-date" type="date" class="p-2 border rounded" />
-        <input id="deadline" type="date" required class="p-2 border rounded" />
+        <div>
+            <label for="order-date" class="date-label">Order Date</label>
+            <input id="order-date" type="date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
+        </div>
+        <div>
+            <label for="deadline" class="date-label">Deadline</label>
+            <input id="deadline" type="date" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
+        </div>
 
-        <fieldset class="md:col-span-2 border p-4 rounded">
-          <legend class="font-semibold mb-2">Delivery</legend>
-          <label><input type="radio" name="delivery" value="address" onchange="toggleDeliveryFields(this.value)"> Address</label>
-          <label><input type="radio" name="delivery" value="email" onchange="toggleDeliveryFields(this.value)"> Email</label>
-          <label><input type="radio" name="delivery" value="whatsapp" onchange="toggleDeliveryFields(this.value)"> WhatsApp</label>
+        <fieldset class="md:col-span-2 border border-gray-300 p-5 rounded-lg">
+          <legend class="font-semibold text-gray-700 mb-3">Delivery</legend>
+          <div class="flex items-center space-x-4 mb-3">
+            <label class="flex items-center space-x-2"><input type="radio" name="delivery" value="address" onchange="toggleDeliveryFields(this.value)" class="form-radio text-purple-600"> <span>Address</span></label>
+            <label class="flex items-center space-x-2"><input type="radio" name="delivery" value="email" onchange="toggleDeliveryFields(this.value)" class="form-radio text-purple-600"> <span>Email</span></label>
+            <label class="flex items-center space-x-2"><input type="radio" name="delivery" value="whatsapp" onchange="toggleDeliveryFields(this.value)" class="form-radio text-purple-600"> <span>WhatsApp</span></label>
+          </div>
 
           <div id="delivery-address" class="hidden mt-2">
-            <input type="text" placeholder="Enter Address" class="w-full p-2 border rounded" />
+            <input type="text" placeholder="Enter Address" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
           </div>
           <div id="delivery-email" class="hidden mt-2">
-            <input type="email" placeholder="Enter Email" class="w-full p-2 border rounded" />
+            <input type="email" placeholder="Enter Email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
           </div>
           <div id="delivery-whatsapp" class="hidden mt-2">
-            <input type="text" placeholder="WhatsApp Number" class="w-full p-2 border rounded" />
+            <input type="text" placeholder="WhatsApp Number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
           </div>
         </fieldset>
 
-        <button type="submit" class="md:col-span-2 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded">Submit Job</button>
+        <button type="submit" class="md:col-span-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Submit Job</button>
       </form>
     </section>
 
-    <!-- Tasks Section -->
-    <section id="tasks" class="hidden">
-      <h2 class="text-xl font-semibold text-purple-700">✅ Tasks</h2>
+    <section id="tasks" class="hidden bg-white p-6 rounded-xl shadow-lg">
+      <h2 class="text-2xl font-bold text-purple-700 mb-6">✅ Tasks</h2>
       <div class="overflow-x-auto mt-4">
-        <table class="w-full bg-white shadow rounded text-sm">
+        <table class="w-full bg-white shadow-md rounded-lg text-sm border-collapse">
           <thead class="bg-gray-100">
             <tr>
-              <th class="border p-2">Customer</th>
-              <th class="border p-2">Phone</th>
-              <th class="border p-2">Contact</th>
-              <th class="border p-2">Details</th>
-              <th class="border p-2">Price</th>
-              <th class="border p-2">Discount</th>
-              <th class="border p-2">Deadline</th>
-              <th class="border p-2">Status</th>
-              <th class="border p-2">Invoice</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Customer</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Phone</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Contact</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Details</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Price</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Discount</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Deadline</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Status</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Invoice</th>
             </tr>
           </thead>
           <tbody id="tasks-body">
-            <!-- Filled via JS -->
-          </tbody>
+            </tbody>
         </table>
       </div>
     </section>
     
-        <!-- Calendar Section -->
-    <section id="calendar" class="hidden">
-      <h2 class="text-xl font-semibold text-purple-700">📅 Calendar</h2>
-      <div id="calendarEl" class="mt-4 bg-white p-4 rounded shadow"></div>
+        <section id="calendar" class="hidden bg-white p-6 rounded-xl shadow-lg">
+      <h2 class="text-2xl font-bold text-purple-700 mb-6">📅 Calendar</h2>
+      <div id="calendarEl" class="mt-4 bg-gray-50 p-4 rounded-lg shadow-inner border border-gray-200"></div>
     </section>
 
-    <!-- Earnings Section -->
-    <section id="earnings" class="hidden">
-      <h2 class="text-xl font-semibold text-purple-700">💰 Earnings</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-        <div class="bg-white p-4 rounded shadow text-center">
+    <section id="earnings" class="hidden bg-white p-6 rounded-xl shadow-lg">
+      <h2 class="text-2xl font-bold text-purple-700 mb-6">💰 Earnings</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+        <div class="bg-white p-5 rounded-lg shadow-md text-center border border-gray-100">
           <p class="text-gray-500 text-sm">Income</p>
-          <h3 class="text-2xl font-bold text-green-600" id="income-total">Rs. 0.00</h3>
+          <h3 class="text-3xl font-extrabold text-green-600 mt-1" id="income-total">Rs. 0.00</h3>
         </div>
-        <div class="bg-white p-4 rounded shadow text-center">
+        <div class="bg-white p-5 rounded-lg shadow-md text-center border border-gray-100">
           <p class="text-gray-500 text-sm">Expenses</p>
-          <h3 class="text-2xl font-bold text-red-600" id="expense-total">Rs. 0.00</h3>
+          <h3 class="text-3xl font-extrabold text-red-600 mt-1" id="expense-total">Rs. 0.00</h3>
         </div>
-        <div class="bg-white p-4 rounded shadow text-center">
+        <div class="bg-white p-5 rounded-lg shadow-md text-center border border-gray-100">
           <p class="text-gray-500 text-sm">Profit</p>
-          <h3 class="text-2xl font-bold text-blue-600" id="profit-total">Rs. 0.00</h3>
+          <h3 class="text-3xl font-extrabold text-blue-600 mt-1" id="profit-total">Rs. 0.00</h3>
         </div>
       </div>
     </section>
 
-    <!-- Expenses Section -->
-    <section id="expenses" class="hidden">
-      <h2 class="text-xl font-semibold text-purple-700">💸 Expenses</h2>
-      <form id="expense-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-4">
-        <input type="text" id="expense-title" placeholder="Title" class="p-2 border rounded"/>
-        <input type="number" id="expense-amount" placeholder="Amount" class="p-2 border rounded"/>
-        <input type="date" id="expense-date" class="p-2 border rounded"/>
-        <button type="submit" class="md:col-span-3 bg-purple-600 text-white py-2 rounded">Add Expense</button>
+    <section id="expenses" class="hidden bg-white p-6 rounded-xl shadow-lg">
+      <h2 class="text-2xl font-bold text-purple-700 mb-6">💸 Expenses</h2>
+      <form id="expense-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-6">
+        <input type="text" id="expense-title" placeholder="Title" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+        <input type="number" id="expense-amount" placeholder="Amount" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+        <div>
+            <label for="expense-date" class="date-label">Date</label>
+            <input type="date" id="expense-date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+        </div>
+        <button type="submit" class="md:col-span-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Add Expense</button>
       </form>
-      <table class="w-full text-sm bg-white rounded shadow">
-        <thead class="bg-gray-100">
-          <tr>
-            <th class="border p-2">Title</th>
-            <th class="border p-2">Amount</th>
-            <th class="border p-2">Date</th>
-          </tr>
-        </thead>
-        <tbody id="expense-body">
-          <!-- Filled via JS -->
-        </tbody>
-      </table>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm bg-white rounded-lg shadow-md border-collapse">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Title</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Amount</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Date</th>
+            </tr>
+          </thead>
+          <tbody id="expense-body">
+            </tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- Reports Section -->
-    <section id="reports" class="hidden">
-      <h2 class="text-xl font-semibold text-purple-700">📈 Reports</h2>
-      <div class="flex flex-wrap gap-4 mt-4 mb-4">
+    <section id="reports" class="hidden bg-white p-6 rounded-xl shadow-lg">
+      <h2 class="text-2xl font-bold text-purple-700 mb-6">📈 Reports</h2>
+      <div class="flex flex-wrap items-end gap-4 mt-4 mb-6">
         <div>
-          <label class="text-sm font-semibold">From:</label>
-          <input type="date" id="report-from" class="px-2 py-1 border rounded" />
+          <label class="text-sm font-semibold text-gray-700">From:</label>
+          <input type="date" id="report-from" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
         </div>
         <div>
-          <label class="text-sm font-semibold">To:</label>
-          <input type="date" id="report-to" class="px-2 py-1 border rounded" />
+          <label class="text-sm font-semibold text-gray-700">To:</label>
+          <input type="date" id="report-to" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
         </div>
-        <button onclick="filterReportByDate()" class="bg-purple-600 text-white px-4 py-2 rounded">Filter</button>
-        <button onclick="clearReportFilter()" class="bg-gray-400 text-white px-4 py-2 rounded">Reset</button>
+        <button onclick="filterReportByDate()" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Filter</button>
+        <button onclick="clearReportFilter()" class="bg-gray-400 hover:bg-gray-500 text-white px-5 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Reset</button>
       </div>
-      <div class="overflow-x-auto bg-white rounded shadow">
-        <table class="w-full text-sm" id="report-table">
+      <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+        <table class="w-full text-sm border-collapse" id="report-table">
           <thead class="bg-gray-100 cursor-pointer">
             <tr>
-              <th class="border p-2" onclick="sortReport('type')">Type ⬍</th>
-              <th class="border p-2" onclick="sortReport('title')">Title ⬍</th>
-              <th class="border p-2" onclick="sortReport('amount')">Amount ⬍</th>
-              <th class="border p-2" onclick="sortReport('date')">Date ⬍</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold" onclick="sortReport('type')">Type ⬍</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold" onclick="sortReport('title')">Title ⬍</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold" onclick="sortReport('amount')">Amount ⬍</th>
+              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold" onclick="sortReport('date')">Date ⬍</th>
             </tr>
           </thead>
           <tbody id="report-body">
-            <!-- Filled via JS -->
-          </tbody>
+            </tbody>
         </table>
       </div>
     </section>
     
-      </main>
+  </main>
 </div>
 
-<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <script>
   const USERS = {
@@ -256,9 +282,35 @@
   function showSection(id) {
     document.querySelectorAll("main > section").forEach(sec => sec.classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
+    // Remove active class from all sidebar buttons
+    document.querySelectorAll('.sidebar button').forEach(button => {
+      button.classList.remove('active', 'bg-purple-200', 'text-purple-800', 'font-bold');
+      button.classList.add('text-gray-700');
+    });
+    // Add active class to the clicked button
+    const activeLink = document.querySelector(`.sidebar button[onclick="showSection('${id}')"]`);
+    if (activeLink) {
+      activeLink.classList.add('active', 'bg-purple-200', 'text-purple-800', 'font-bold');
+      activeLink.classList.remove('text-gray-700');
+    }
+
     if (id === "calendar" && calendar) calendar.render();
     if (id === "tasks") updateTasks();
   }
+
+  // Set initial dashboard link to active and set current dates
+  document.addEventListener('DOMContentLoaded', () => {
+    const dashboardLink = document.getElementById('dashboard-link');
+    if (dashboardLink) {
+      dashboardLink.classList.add('active', 'bg-purple-200', 'text-purple-800', 'font-bold');
+      dashboardLink.classList.remove('text-gray-700');
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('order-date').value = today;
+    document.getElementById('expense-date').value = today;
+  });
+
 
   function initCalendar() {
     const el = document.getElementById("calendarEl");
@@ -269,9 +321,13 @@
         const deadline = new Date(info.event.start);
         const now = new Date();
         const diff = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
-        if (diff <= 2) info.el.style.backgroundColor = '#fecaca';
-        else if (diff <= 5) info.el.style.backgroundColor = '#fde68a';
-        else info.el.style.backgroundColor = '#bbf7d0';
+        if (diff <= 2) info.el.style.backgroundColor = '#fecaca'; // Red-100
+        else if (diff <= 5) info.el.style.backgroundColor = '#fde68a'; // Yellow-100
+        else info.el.style.backgroundColor = '#bbf7d0'; // Green-100
+        info.el.style.borderColor = 'transparent'; // Remove default border
+        info.el.style.color = '#333'; // Darken event text
+        info.el.style.padding = '4px 6px'; // Add padding to event
+        info.el.style.borderRadius = '4px'; // Rounded corners for event
       }
     });
     calendar.render();
@@ -308,8 +364,10 @@
     updateReports();
 
     this.reset();
-    document.getElementById("order-date").value = new Date().toISOString().split("T")[0];
+    document.getElementById("order-date").value = new Date().toISOString().split("T")[0]; // Re-set current date after reset
     document.getElementById("total-display").textContent = "Rs. 0.00";
+    // Hide delivery fields after submission
+    toggleDeliveryFields('');
   });
 
   document.getElementById("price").addEventListener("input", updateTotal);
@@ -324,40 +382,49 @@
     document.getElementById("delivery-address").classList.add("hidden");
     document.getElementById("delivery-email").classList.add("hidden");
     document.getElementById("delivery-whatsapp").classList.add("hidden");
+    // Also uncheck all radio buttons to ensure a clean state
+    document.querySelectorAll('input[name="delivery"]').forEach(radio => radio.checked = false);
+
     if (type === "address") document.getElementById("delivery-address").classList.remove("hidden");
     if (type === "email") document.getElementById("delivery-email").classList.remove("hidden");
     if (type === "whatsapp") document.getElementById("delivery-whatsapp").classList.remove("hidden");
+    // Re-check the selected radio button
+    if (type) document.querySelector(`input[name="delivery"][value="${type}"]`).checked = true;
   }
 
   function updateTasks() {
     const tbody = document.getElementById("tasks-body");
     tbody.innerHTML = "";
     const now = new Date();
-    stats.in_progress = stats.completed = stats.cancelled = 0;
+    stats.in_progress = 0;
+    stats.completed = 0;
+    stats.cancelled = 0;
+
     jobData.forEach((job, idx) => {
       const age = (now - new Date(job.deadline)) / (1000 * 60 * 60 * 24);
-      if (job.status === "completed" && age > 15) return;
+      // Keep completed jobs for a longer period if desired, or remove filtering for simpler view
+      // if (job.status === "completed" && age > 15) return;
 
       stats[job.status]++;
       const row = document.createElement("tr");
-      row.className = job.status === "completed" ? "bg-green-100" :
-                      job.status === "cancelled" ? "bg-red-100" : "bg-yellow-100";
+      row.className = job.status === "completed" ? "bg-green-50" :
+                      job.status === "cancelled" ? "bg-red-50" : "bg-yellow-50"; // Lighter shades for rows
       row.innerHTML = `
-        <td class="border p-2">${job.customer}</td>
-        <td class="border p-2">${job.phone}</td>
-        <td class="border p-2">${job.contact}</td>
-        <td class="border p-2">${job.details}</td>
-        <td class="border p-2">${job.price}</td>
-        <td class="border p-2">${job.discount}</td>
-        <td class="border p-2">${job.deadline}</td>
-        <td class="border p-2">
-          <select onchange="updateStatus(this, ${idx})">
+        <td class="border border-gray-200 p-3">${job.customer}</td>
+        <td class="border border-gray-200 p-3">${job.phone}</td>
+        <td class="border border-gray-200 p-3">${job.contact}</td>
+        <td class="border border-gray-200 p-3">${job.details}</td>
+        <td class="border border-gray-200 p-3">Rs. ${job.price.toFixed(2)}</td>
+        <td class="border border-gray-200 p-3">Rs. ${job.discount.toFixed(2)}</td>
+        <td class="border border-gray-200 p-3">${job.deadline}</td>
+        <td class="border border-gray-200 p-3">
+          <select onchange="updateStatus(this, ${idx})" class="p-2 border border-gray-300 rounded-lg bg-white focus:ring-purple-500 focus:border-purple-500">
             <option value="in_progress" ${job.status === "in_progress" ? "selected" : ""}>In Progress</option>
             <option value="completed" ${job.status === "completed" ? "selected" : ""}>Completed</option>
             <option value="cancelled" ${job.status === "cancelled" ? "selected" : ""}>Cancelled</option>
           </select>
         </td>
-        <td class="border p-2"><button class="text-blue-600">Print</button></td>`;
+        <td class="border border-gray-200 p-3"><button class="text-blue-600 hover:text-blue-800 font-semibold">Print</button></td>`;
       tbody.appendChild(row);
     });
     updateDashboard();
@@ -379,6 +446,19 @@
     }
     updateTasks();
     updateReports();
+    // Update calendar event color if status changes
+    if (calendar) {
+      const event = calendar.getEventById(job.id); // You might need to assign an ID to events for this to work perfectly
+      if (event) {
+        if (newStatus === "completed") {
+          event.setProp('backgroundColor', '#bbf7d0'); // Green
+        } else if (newStatus === "cancelled") {
+          event.setProp('backgroundColor', '#fecaca'); // Red
+        } else {
+          event.setProp('backgroundColor', '#fde68a'); // Yellow
+        }
+      }
+    }
   }
 
   function updateDashboard() {
@@ -399,6 +479,7 @@
     expenseData.push({ title, amount, date });
     totalExpenses += amount;
     updateDashboard();
+    updateReports();
     this.reset();
     document.getElementById("expense-date").value = new Date().toISOString().split("T")[0];
   });
@@ -407,18 +488,21 @@
     const tbody = document.getElementById("report-body");
     tbody.innerHTML = "";
     jobData.forEach(j => {
-      tbody.innerHTML += `<tr>
-        <td class="border p-2">Income</td>
-        <td class="border p-2">${j.customer}</td>
-        <td class="border p-2">Rs. ${(j.price - j.discount).toFixed(2)}</td>
-        <td class="border p-2">${j.orderDate}</td></tr>`;
+      // Only include income if not cancelled or if it was counted
+      if (j.status !== "cancelled" || j.incomeCounted) {
+        tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors duration-100">
+          <td class="border border-gray-200 p-3 text-green-700">Income</td>
+          <td class="border border-gray-200 p-3">${j.customer}</td>
+          <td class="border border-gray-200 p-3 font-semibold">Rs. ${(j.price - j.discount).toFixed(2)}</td>
+          <td class="border border-gray-200 p-3">${j.orderDate}</td></tr>`;
+      }
     });
     expenseData.forEach(e => {
-      tbody.innerHTML += `<tr>
-        <td class="border p-2">Expense</td>
-        <td class="border p-2">${e.title}</td>
-        <td class="border p-2">Rs. ${e.amount.toFixed(2)}</td>
-        <td class="border p-2">${e.date}</td></tr>`;
+      tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors duration-100">
+        <td class="border border-gray-200 p-3 text-red-700">Expense</td>
+        <td class="border border-gray-200 p-3">${e.title}</td>
+        <td class="border border-gray-200 p-3 font-semibold">Rs. ${e.amount.toFixed(2)}</td>
+        <td class="border border-gray-200 p-3">${e.date}</td></tr>`;
     });
   }
 
@@ -445,13 +529,26 @@
     const index = { type: 0, title: 1, amount: 2, date: 3 }[col];
     const dir = sortDirection[col] = !sortDirection[col];
     rows.sort((a, b) => {
-      const va = a.children[index].textContent.trim();
-      const vb = b.children[index].textContent.trim();
-      if (col === 'amount') return dir ? parseFloat(va.slice(3)) - parseFloat(vb.slice(3)) : parseFloat(vb.slice(3)) - parseFloat(va.slice(3));
-      return dir ? va.localeCompare(vb) : vb.localeCompare(va);
+      let va = a.children[index].textContent.trim();
+      let vb = b.children[index].textContent.trim();
+
+      if (col === 'amount') {
+        va = parseFloat(va.replace('Rs. ', ''));
+        vb = parseFloat(vb.replace('Rs. ', ''));
+        return dir ? va - vb : vb - va;
+      }
+      // For date, ensure proper comparison
+      if (col === 'date') {
+        va = new Date(va);
+        vb = new Date(vb);
+      }
+      
+      if (va === vb) return 0;
+      return dir ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
     });
     rows.forEach(r => tbody.appendChild(r));
   }
 </script>
 </body>
 </html>
+```
