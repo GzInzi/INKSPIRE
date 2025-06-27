@@ -33,6 +33,27 @@
         display: block; /* Ensures it takes full width */
     }
   </style>
+  <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBK4zY3Et3E_bdKhY3Ke6cre1wSl8fyupw",
+    authDomain: "inkspire-93fa1.firebaseapp.com",
+    projectId: "inkspire-93fa1",
+    storageBucket: "inkspire-93fa1.appspot.com",
+    messagingSenderId: "78600122689",
+    appId: "1:78600122689:web:37da9c31db4fb36d4d71c0"
+  };
+
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+</script>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
