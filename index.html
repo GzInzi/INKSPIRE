@@ -7,569 +7,1245 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      /* Define custom cubic-bezier for smoother animations */
+      --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Slight overshoot */
+      --ease-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    }
+
     body {
       font-family: 'Inter', sans-serif;
+      overflow-x: hidden; /* Prevent horizontal scroll due to animations */
     }
     .hidden { display: none; }
     .active { font-weight: bold; }
-    /* Subtle transition for buttons */
-    button {
-      transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+
+    /* General Transitions for smoother UI */
+    button, input, select, textarea, .sidebar button, table tr, .toast-message, .dashboard-card {
+      transition: all 0.3s var(--ease-out-quad); /* Apply default transition timing */
     }
-    button:hover {
-      transform: translateY(-1px);
+
+    /* Button Hover Effects (More pronounced lift) */
+    button:not(.sidebar button, .action-button) {
+      transition: background-color 0.2s var(--ease-out-quad), transform 0.2s var(--ease-out-quad), box-shadow 0.2s var(--ease-out-quad);
     }
-    /* Custom focus style for inputs */
+    button:not(.sidebar button, .action-button):hover {
+      transform: translateY(-3px) scale(1.01); /* More noticeable lift and subtle scale */
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18); /* Stronger, diffused shadow */
+    }
+
+    /* Input Focus Effects (Slightly more integrated glow) */
     input:focus, textarea:focus, select:focus {
       outline: none;
-      border-color: #8B5CF6; /* purple-500 */
-      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2); /* purple-500 with opacity */
+      border-color: #8B5CF6; /* Tailwind purple-500 */
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.35); /* Deeper, softer glow */
+      transform: scale(1.005); /* Very subtle zoom */
     }
-    /* Style for date labels */
+
+    /* Sidebar Navigation Hover Effects (Smooth slide and distinct active state) */
+    .sidebar button {
+      transition: background-color 0.2s var(--ease-out-quad), color 0.2s var(--ease-out-quad), transform 0.2s var(--ease-out-quad), box-shadow 0.2s var(--ease-out-quad);
+      position: relative; /* For the border pseudo-element */
+    }
+    .sidebar button:hover {
+      transform: translateX(8px); /* More pronounced slide right */
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.08); /* Subtle shadow on hover */
+    }
+    .sidebar button.active {
+      background-color: #EDE9FE; /* Tailwind purple-100 */
+      color: #6D28D9; /* Tailwind purple-700 */
+      font-weight: 700; /* Bold */
+      border-left: 4px solid #8B5CF6; /* Accent border */
+      padding-left: 12px; /* Adjust padding for border */
+      transform: translateX(0); /* Ensure active state doesn't have transform */
+      box-shadow: none; /* Remove shadow if active */
+    }
+
+    /* Table Row Hover Effect (Subtle lift and shadow) */
+    table tbody tr:hover {
+      background-color: #F3F4F6; /* Light gray on hover */
+      transform: translateY(-2px); /* Slight lift */
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Subtle row shadow */
+    }
+
+    /* Date Label Styling */
     .date-label {
-        font-weight: 600; /* Semi-bold */
-        color: #6B21A8; /* A darker purple for emphasis */
-        margin-bottom: 0.5rem; /* Space below the label */
-        display: block; /* Ensures it takes full width */
+      font-weight: 600;
+      color: #6B21A8; /* Tailwind purple-800 */
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    /* Toast Message Styling (Enhanced with slide-up & overshoot) */
+    .toast-message {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px); /* Start further below */
+      background-color: #4CAF50; /* Green for success */
+      color: white;
+      padding: 12px 25px;
+      border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35); /* Stronger shadow */
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.4s var(--ease-out-quad), transform 0.5s var(--ease-out-back); /* Different timing functions */
+      min-width: 280px;
+      text-align: center;
+      will-change: opacity, transform; /* Optimize for animation performance */
+    }
+    .toast-message.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0); /* Slide up to position */
+    }
+    .toast-message.error {
+      background-color: #F44336; /* Red for error */
+    }
+
+    /* Keyframe for Fade In Up animation (for sections and dashboard cards) */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(25px); /* Start a bit lower */
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Section Transition (Fade-in and slight slide-up) */
+    .section-transition {
+      opacity: 0;
+      transform: translateY(25px); /* Initially hidden lower */
+      animation: fadeInUp 0.6s var(--ease-out-quad) forwards; /* Apply animation */
+    }
+    /* No need for .animate-in class if we use forwards on animation */
+
+    /* Dashboard Card Entrance Animation (Staggered) */
+    .dashboard-card {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.5s var(--ease-out-quad) forwards;
+    }
+    /* Add animation delays to stagger their appearance */
+    .dashboard-card:nth-child(1) { animation-delay: 0.05s; }
+    .dashboard-card:nth-child(2) { animation-delay: 0.1s; }
+    .dashboard-card:nth-child(3) { animation-delay: 0.15s; }
+    .dashboard-card:nth-child(4) { animation-delay: 0.2s; }
+
+    /* Tasks table specific styling */
+    #tasks-body td, #expense-body td {
+      font-size: 0.85rem; /* Smaller font for table cells */
+      padding: 0.75rem; /* Adjusted padding */
+    }
+    #tasks-body select, #expense-body select {
+      font-size: 0.8rem; /* Smaller font for dropdowns in table */
+    }
+    #tasks-body input, #tasks-body textarea, #expense-body input {
+      font-size: 0.85rem; /* Smaller font for inputs in table */
+    }
+
+    /* FullCalendar event colors for better visibility */
+    .fc-event-red { /* Deadline <= 2 days */
+      background-color: #ef4444 !important; /* Tailwind red-500 */
+      border-color: #ef4444 !important;
+      color: white !important;
+    }
+    .fc-event-yellow { /* Deadline > 2 days and <= 5 days */
+      background-color: #f59e0b !important; /* Tailwind amber-500 */
+      border-color: #f59e0b !important;
+      color: white !important;
+    }
+    .fc-event-green { /* Deadline > 5 days */
+      background-color: #22c55e !important; /* Tailwind green-500 */
+      border-color: #22c55e !important;
+      color: white !important;
+    }
+    .fc-event {
+      padding: 4px 6px !important;
+      border-radius: 4px !important;
     }
   </style>
-  <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
 
-<script>
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBK4zY3Et3E_bdKhY3Ke6cre1wSl8fyupw",
-    authDomain: "inkspire-93fa1.firebaseapp.com",
-    projectId: "inkspire-93fa1",
-    storageBucket: "inkspire-93fa1.appspot.com",
-    messagingSenderId: "78600122689",
-    appId: "1:78600122689:web:37da9c31db4fb36d4d71c0"
-  };
+  
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    // Your web app's Firebase configuration
+    // IMPORTANT: Replace these with your actual Firebase project configuration
+    const firebaseConfig = {
+      apiKey:    "YOUR_FIREBASE_API_KEY", // <--- REPLACE THIS WITH YOUR ACTUAL API KEY
+      authDomain:"inkspire-93fa1.firebaseapp.com",
+      projectId: "inkspire-93fa1",
+      storageBucket: "inkspire-93fa1.appspot.com",
+      messagingSenderId:"78600122689",
+      appId:     "1:78600122689:web:37da9c31db4fb36d4d71c0"
+    };
 
-  // Initialize Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-</script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
+
+    // Sign in anonymously so Firestore writes are allowed
+    // This is important for data operations later, but doesn't affect login authentication
+    auth.signInAnonymously()
+      .then(() => console.log("🔑 Signed in anonymously to Firebase"))
+      .catch(err => console.error("Firebase Auth error:", err));
+  </script>
 </head>
+
 <body class="bg-gray-50 text-gray-800">
-
+  
 <div id="login-screen" class="flex items-center justify-center h-screen bg-gradient-to-br from-purple-600 to-indigo-700">
-  <div class="bg-white p-10 rounded-xl shadow-2xl w-full max-w-sm transform transition-all duration-300 hover:scale-105">
-    <h2 class="text-3xl font-extrabold text-center text-purple-700 mb-8">INKSPIRE Login</h2>
-    <input id="username" type="text" placeholder="Username" class="w-full px-5 py-3 border border-gray-300 rounded-lg mb-4 focus:ring-purple-500 focus:border-purple-500"/>
-    <input id="password" type="password" placeholder="Password" class="w-full px-5 py-3 border border-gray-300 rounded-lg mb-6 focus:ring-purple-500 focus:border-purple-500"/>
-    <button onclick="login()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg">Login</button>
-    <p id="login-error" class="text-red-500 mt-5 text-center hidden">Invalid credentials. Try again.</p>
-  </div>
-</div>
-
-<div id="app" class="hidden flex h-screen">
-  <aside class="w-64 bg-white shadow-xl p-6 space-y-6 flex flex-col justify-between">
-    <div>
-      <div class="text-3xl font-extrabold text-purple-700 mb-6 tracking-wide">INKSPIRE</div>
-      <nav class="sidebar space-y-3">
-        <button onclick="showSection('dashboard')" id="dashboard-link" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📊 Dashboard</button>
-        <button onclick="showSection('job-order')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📝 New Job Order</button>
-        <button onclick="showSection('calendar')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📅 Calendar</button>
-        <button onclick="showSection('tasks')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">✅ Tasks</button>
-        
-        <div class="border-t border-gray-200 my-3"></div> <button onclick="showSection('expenses')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">💸 Expenses</button>
-        <button onclick="showSection('earnings')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">💰 Earnings</button>
-        
-        <div class="border-t border-gray-200 my-3"></div> <button onclick="showSection('reports')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📈 Reports</button>
-      </nav>
+    <div class="bg-white p-10 rounded-xl shadow-2xl w-full max-w-sm transform transition-all duration-300 hover:scale-105">
+      <h2 class="text-3xl font-extrabold text-center text-purple-700 mb-8">INKSPIRE Login</h2>
+      <input id="username" type="text" placeholder="Username" class="w-full px-5 py-3 border border-gray-300 rounded-lg mb-4 focus:ring-purple-500 focus:border-purple-500"/>
+      <input id="password" type="password" placeholder="Password" class="w-full px-5 py-3 border border-gray-300 rounded-lg mb-6 focus:ring-purple-500 focus:border-purple-500"/>
+      <button onclick="login()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg">Login</button>
+      <p id="login-error" class="text-red-500 mt-5 text-center hidden">Invalid credentials. Try again.</p>
     </div>
-    <button onclick="logout()" class="block text-left w-full text-red-600 hover:text-red-800 py-2 px-3 rounded-lg bg-red-50 hover:bg-red-100 transition-colors duration-200 mt-auto">🚪 Logout</button>
-  </aside>
+  </div>
 
-  <main class="flex-1 p-8 space-y-10 overflow-y-auto bg-gray-100">
-    <section id="dashboard" class="hidden bg-white p-6 rounded-xl shadow-lg">
-      <h2 class="text-2xl font-bold text-purple-700 mb-6">📊 Dashboard</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
-        <div class="bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
-          <p class="text-gray-500 text-sm">Total Jobs</p><h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-total">0</h3>
+  
+<div id="app" class="hidden flex h-screen">
+    <aside class="w-64 bg-white shadow-xl p-6 space-y-6 flex flex-col justify-between">
+      <div>
+        <div class="mb-6">
+            <img src="LOGO.png" alt="INKSPIRE Logo" class="w-full h-auto max-h-20 object-contain">
         </div>
-        <div class="bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
-          <p class="text-gray-500 text-sm">In Progress</p><h3 class="text-3xl font-extrabold text-yellow-500 mt-1" id="stat-progress">0</h3>
-        </div>
-        <div class="bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
-          <p class="text-gray-500 text-sm">Completed</p><h3 class="text-3xl font-extrabold text-green-600 mt-1" id="stat-completed">0</h3>
-        </div>
-        <div class="bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
-          <p class="text-gray-500 text-sm">Cancelled</p><h3 class="text-3xl font-extrabold text-red-600 mt-1" id="stat-cancelled">0</h3>
-        </div>
+        <nav class="sidebar space-y-3">
+          <button onclick="showSection('dashboard')" id="dashboard-link" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📊 Dashboard</button>
+          <button onclick="showSection('job-order')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📝 New Job Order</button>
+          <button onclick="showSection('calendar')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📅 Calendar</button>
+          <button onclick="showSection('tasks')"   class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">✅ Tasks</button>
+          <div class="border-t border-gray-200 my-3"></div>
+          <button onclick="showSection('expenses')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">💸 Expenses</button>
+          <button onclick="showSection('earnings')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">💰 Earnings</button>
+          <div class="border-t border-gray-200 my-3"></div>
+          <button onclick="showSection('reports')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📈 Reports</button>
+        </nav>
       </div>
-    </section>
-    
-        <section id="job-order" class="hidden bg-white p-6 rounded-xl shadow-lg">
-      <h2 class="text-2xl font-bold text-purple-700 mb-6">📝 New Job Order</h2>
-      <form id="job-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-        <input id="customer" type="text" required placeholder="Customer Name" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
-        <input id="customer-phone" type="text" required placeholder="Phone Number" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
+      <button onclick="logout()" class="block text-left w-full text-red-600 hover:text-red-800 py-2 px-3 rounded-lg bg-red-50 hover:bg-red-100 transition-colors duration-200 mt-auto">🚪 Logout</button>
+    </aside>
 
-        <fieldset class="md:col-span-2 border border-gray-300 p-5 rounded-lg">
-          <legend class="font-semibold text-gray-700 mb-3">Job Details</legend>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Scanning" class="form-checkbox text-purple-600 rounded"> <span>Scanning</span></label>
-            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Laminating" class="form-checkbox text-purple-600 rounded"> <span>Laminating</span></label>
-            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Fax" class="form-checkbox text-purple-600 rounded"> <span>Fax</span></label>
-            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Photocopy" class="form-checkbox text-purple-600 rounded"> <span>Photocopy</span></label>
-            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Business Card" class="form-checkbox text-purple-600 rounded"> <span>Business Card</span></label>
-            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Colour Printing" class="form-checkbox text-purple-600 rounded"> <span>Colour Printing</span></label>
-            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="B&W Printing" class="form-checkbox text-purple-600 rounded"> <span>B&W Printing</span></label>
-            <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Other" class="form-checkbox text-purple-600 rounded"> <span>Other</span></label>
+    <main class="flex-1 p-8 space-y-10 overflow-y-auto bg-gray-100">
+      
+<section id="dashboard" class="hidden section-transition bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold text-purple-700 mb-6">📊 Dashboard</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
+          <div class="dashboard-card bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
+            <p class="text-gray-500 text-sm">Total Jobs</p>
+            <h3 class="text-3xl font-extrabold text-gray-800 mt-1" id="stat-total">0</h3>
           </div>
-          <textarea id="other-details" placeholder="Other details..." class="w-full mt-4 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"></textarea>
-        </fieldset>
+          <div class="dashboard-card bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
+            <p class="text-gray-500 text-sm">In Progress</p>
+            <h3 class="text-3xl font-extrabold text-yellow-500 mt-1" id="stat-progress">0</h3>
+          </div>
+          <div class="dashboard-card bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
+            <p class="text-gray-500 text-sm">Completed</p>
+            <h3 class="text-3xl font-extrabold text-green-600 mt-1" id="stat-completed">0</h3>
+          </div>
+          <div class="dashboard-card bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
+            <p class="text-gray-500 text-sm">Cancelled</p>
+            <h3 class="text-3xl font-extrabold text-red-600 mt-1" id="stat-cancelled">0</h3>
+          </div>
+        </div>
+      </section>
 
-        <input id="price" type="number" required placeholder="Price (Rs)" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
-        <input id="discount" type="number" required placeholder="Discount (Rs)" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
-        <p class="md:col-span-2 text-xl font-bold text-purple-700">Total: <span id="total-display">Rs. 0.00</span></p>
+      
+<section id="job-order" class="hidden section-transition bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold text-purple-700 mb-6">📝 New Job Order</h2>
+        <form id="job-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          <input id="customer"       type="text"     required placeholder="Customer Name" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          <input id="customer-phone" type="text"     required placeholder="Phone Number"  class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          
+          <fieldset class="md:col-span-2 border border-gray-300 p-5 rounded-lg">
+            <legend class="font-semibold text-gray-700 mb-3">Job Details</legend>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Scanning" class="form-checkbox text-purple-600 rounded"> <span>Scanning</span></label>
+              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Laminating" class="form-checkbox text-purple-600 rounded"> <span>Laminating</span></label>
+              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Fax"       class="form-checkbox text-purple-600 rounded"> <span>Fax</span></label>
+              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Photocopy"class="form-checkbox text-purple-600 rounded"> <span>Photocopy</span></label>
+              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Business Card" class="form-checkbox text-purple-600 rounded"> <span>Business Card</span></label>
+              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Colour Printing" class="form-checkbox text-purple-600 rounded"> <span>Colour Printing</span></label>
+              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="B&W Printing"    class="form-checkbox text-purple-600 rounded"> <span>B&W Printing</span></label>
+              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Other"            class="form-checkbox text-purple-600 rounded"> <span>Other</span></label>
+            </div>
+            <textarea id="other-details" placeholder="Other details." class="w-full mt-4 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"></textarea>
+          </fieldset>
 
-        <div>
+          <input id="price"    type="number" required placeholder="Price (Rs)"    class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          <input id="discount" type="number" required placeholder="Discount (Rs)" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          <p class="md:col-span-2 text-xl font-bold text-purple-700">Total: <span id="total-display">Rs. 0.00</span></p>
+
+          <div>
             <label for="order-date" class="date-label">Order Date</label>
-            <input id="order-date" type="date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
-        </div>
-        <div>
+            <input id="order-date" type="date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          </div>
+          <div>
             <label for="deadline" class="date-label">Deadline</label>
-            <input id="deadline" type="date" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
-        </div>
-
-        <fieldset class="md:col-span-2 border border-gray-300 p-5 rounded-lg">
-          <legend class="font-semibold text-gray-700 mb-3">Delivery</legend>
-          <div class="flex items-center space-x-4 mb-3">
-            <label class="flex items-center space-x-2"><input type="radio" name="delivery" value="address" onchange="toggleDeliveryFields(this.value)" class="form-radio text-purple-600"> <span>Address</span></label>
-            <label class="flex items-center space-x-2"><input type="radio" name="delivery" value="email" onchange="toggleDeliveryFields(this.value)" class="form-radio text-purple-600"> <span>Email</span></label>
-            <label class="flex items-center space-x-2"><input type="radio" name="delivery" value="whatsapp" onchange="toggleDeliveryFields(this.value)" class="form-radio text-purple-600"> <span>WhatsApp</span></label>
+            <input id="deadline" type="date" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
           </div>
 
-          <div id="delivery-address" class="hidden mt-2">
-            <input type="text" placeholder="Enter Address" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
-          </div>
-          <div id="delivery-email" class="hidden mt-2">
-            <input type="email" placeholder="Enter Email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
-          </div>
-          <div id="delivery-whatsapp" class="hidden mt-2">
-            <input type="text" placeholder="WhatsApp Number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
-          </div>
-        </fieldset>
+          <fieldset class="md:col-span-2 border border-gray-300 p-5 rounded-lg">
+            <legend class="font-semibold text-gray-700 mb-3">Delivery</legend>
+            <div class="flex items-center space-x-4 mb-3">
+              <label class="flex items-center space-x-2"><input type="radio" name="delivery" value="address" onchange="toggleDeliveryFields(this.value)" class="form-radio text-purple-600"> <span>Address</span></label>
+              <label class="flex items-center space-x-2"><input type="radio" name="delivery" value="email"   onchange="toggleDeliveryFields(this.value)" class="form-radio text-purple-600"> <span>Email</span></label>
+              <label class="flex items-center space-x-2"><input type="radio" name="delivery" value="whatsapp" onchange="toggleDeliveryFields(this.value)" class="form-radio text-purple-600"> <span>WhatsApp</span></label>
+            </div>
+            <div id="delivery-address" class="hidden mt-2"><input type="text" placeholder="Enter Address" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/></div>
+            <div id="delivery-email"   class="hidden mt-2"><input type="email" placeholder="Enter Email"    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/></div>
+            <div id="delivery-whatsapp" class="hidden mt-2"><input type="text" placeholder="WhatsApp Number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/></div>
+          </fieldset>
 
-        <button type="submit" class="md:col-span-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Submit Job</button>
-      </form>
-    </section>
+          <button type="submit" class="md:col-span-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Submit Job</button>
+        </form>
+      </section>
 
-    <section id="tasks" class="hidden bg-white p-6 rounded-xl shadow-lg">
-      <h2 class="text-2xl font-bold text-purple-700 mb-6">✅ Tasks</h2>
-      <div class="overflow-x-auto mt-4">
-        <table class="w-full bg-white shadow-md rounded-lg text-sm border-collapse">
-          <thead class="bg-gray-100">
-            <tr>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Customer</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Phone</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Contact</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Details</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Price</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Discount</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Deadline</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Status</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Invoice</th>
-            </tr>
-          </thead>
-          <tbody id="tasks-body">
-            </tbody>
-        </table>
-      </div>
-    </section>
-    
-        <section id="calendar" class="hidden bg-white p-6 rounded-xl shadow-lg">
-      <h2 class="text-2xl font-bold text-purple-700 mb-6">📅 Calendar</h2>
-      <div id="calendarEl" class="mt-4 bg-gray-50 p-4 rounded-lg shadow-inner border border-gray-200"></div>
-    </section>
-
-    <section id="earnings" class="hidden bg-white p-6 rounded-xl shadow-lg">
-      <h2 class="text-2xl font-bold text-purple-700 mb-6">💰 Earnings</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-        <div class="bg-white p-5 rounded-lg shadow-md text-center border border-gray-100">
-          <p class="text-gray-500 text-sm">Income</p>
-          <h3 class="text-3xl font-extrabold text-green-600 mt-1" id="income-total">Rs. 0.00</h3>
+      
+<section id="tasks" class="hidden section-transition bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold text-purple-700 mb-6">✅ Tasks
+            <button onclick="undoLastChange()" class="ml-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-3 rounded-lg text-sm shadow-sm transition-all duration-200">Undo Last Change</button>
+        </h2>
+        <div class="overflow-x-auto mt-4">
+          <table class="w-full bg-white shadow-md rounded-lg text-sm border-collapse">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Customer</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Phone</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Contact</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Details</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Price</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Discount</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Deadline</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Status</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Invoice</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tasks-body"></tbody>
+          </table>
         </div>
-        <div class="bg-white p-5 rounded-lg shadow-md text-center border border-gray-100">
-          <p class="text-gray-500 text-sm">Expenses</p>
-          <h3 class="text-3xl font-extrabold text-red-600 mt-1" id="expense-total">Rs. 0.00</h3>
-        </div>
-        <div class="bg-white p-5 rounded-lg shadow-md text-center border border-gray-100">
-          <p class="text-gray-500 text-sm">Profit</p>
-          <h3 class="text-3xl font-extrabold text-blue-600 mt-1" id="profit-total">Rs. 0.00</h3>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <section id="expenses" class="hidden bg-white p-6 rounded-xl shadow-lg">
-      <h2 class="text-2xl font-bold text-purple-700 mb-6">💸 Expenses</h2>
-      <form id="expense-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-6">
-        <input type="text" id="expense-title" placeholder="Title" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
-        <input type="number" id="expense-amount" placeholder="Amount" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
-        <div>
+      
+<section id="calendar" class="hidden section-transition bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold text-purple-700 mb-6">📅 Calendar</h2>
+        <div id="calendarEl" class="mt-4 bg-gray-50 p-4 rounded-lg shadow-inner border border-gray-200"></div>
+      </section>
+
+      
+<section id="earnings" class="hidden section-transition bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold text-purple-700 mb-6">💰 Earnings</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+          <div class="dashboard-card bg-white p-5 rounded-lg shadow-md text-center border border-gray-100">
+            <p class="text-gray-500 text-sm">Income</p>
+            <h3 class="text-3xl font-extrabold text-green-600 mt-1" id="income-total">Rs. 0.00</h3>
+          </div>
+          <div class="dashboard-card bg-white p-5 rounded-lg shadow-md text-center border border-gray-100">
+            <p class="text-gray-500 text-sm">Expenses</p>
+            <h3 class="text-3xl font-extrabold text-red-600 mt-1" id="expense-total">Rs. 0.00</h3>
+          </div>
+          <div class="dashboard-card bg-white p-5 rounded-lg shadow-md text-center border border-gray-100">
+            <p class="text-gray-500 text-sm">Profit</p>
+            <h3 class="text-3xl font-extrabold text-blue-600 mt-1" id="profit-total">Rs. 0.00</h3>
+          </div>
+        </div>
+      </section>
+
+      
+<section id="expenses" class="hidden section-transition bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold text-purple-700 mb-6">💸 Expenses
+            <button onclick="undoLastChange()" class="ml-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-3 rounded-lg text-sm shadow-sm transition-all duration-200">Undo Last Change</button>
+        </h2>
+        <form id="expense-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-6">
+          <input type="text"    id="expense-title"  placeholder="Title" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          <input type="number" id="expense-amount" placeholder="Amount" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          <div>
             <label for="expense-date" class="date-label">Date</label>
             <input type="date" id="expense-date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          </div>
+          <button type="submit" class="md:col-span-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Add Expense</button>
+        </form>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm bg-white rounded-lg shadow-md border-collapse">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Title</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Amount</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Date</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expense-body"></tbody>
+          </table>
         </div>
-        <button type="submit" class="md:col-span-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Add Expense</button>
-      </form>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm bg-white rounded-lg shadow-md border-collapse">
-          <thead class="bg-gray-100">
-            <tr>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Title</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Amount</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Date</th>
-            </tr>
-          </thead>
-          <tbody id="expense-body">
-            </tbody>
-        </table>
-      </div>
-    </section>
+      </section>
 
-    <section id="reports" class="hidden bg-white p-6 rounded-xl shadow-lg">
-      <h2 class="text-2xl font-bold text-purple-700 mb-6">📈 Reports</h2>
-      <div class="flex flex-wrap items-end gap-4 mt-4 mb-6">
-        <div>
-          <label class="text-sm font-semibold text-gray-700">From:</label>
-          <input type="date" id="report-from" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
+      
+<section id="reports" class="hidden section-transition bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold text-purple-700 mb-6">📈 Reports</h2>
+        <div class="flex flex-wrap items-end gap-4 mt-4 mb-6">
+          <div>
+            <label class="text-sm font-semibold text-gray-700">From:</label>
+            <input type="date" id="report-from" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          </div>
+          <div>
+            <label class="text-sm font-semibold text-gray-700">To:</label>
+            <input type="date" id="report-to" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          </div>
+          <button onclick="filterReportByDate()" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Filter</button>
+          <button onclick="clearReportFilter()"  class="bg-gray-400 hover:bg-gray-500  text-white px-5 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Reset</button>
         </div>
-        <div>
-          <label class="text-sm font-semibold text-gray-700">To:</label>
-          <input type="date" id="report-to" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
+        <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+          <table class="w-full text-sm border-collapse" id="report-table">
+            <thead class="bg-gray-100 cursor-pointer">
+              <tr>
+                <th onclick="sortReport('type')"  class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Type ⬍</th>
+                <th onclick="sortReport('title')" class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Title ⬍</th>
+                <th onclick="sortReport('amount')"class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Amount ⬍</th>
+                <th onclick="sortReport('date')"  class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Date ⬍</th>
+              </tr>
+            </thead>
+            <tbody id="report-body"></tbody>
+          </table>
         </div>
-        <button onclick="filterReportByDate()" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Filter</button>
-        <button onclick="clearReportFilter()" class="bg-gray-400 hover:bg-gray-500 text-white px-5 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Reset</button>
-      </div>
-      <div class="overflow-x-auto bg-white rounded-lg shadow-md">
-        <table class="w-full text-sm border-collapse" id="report-table">
-          <thead class="bg-gray-100 cursor-pointer">
-            <tr>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold" onclick="sortReport('type')">Type ⬍</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold" onclick="sortReport('title')">Title ⬍</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold" onclick="sortReport('amount')">Amount ⬍</th>
-              <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold" onclick="sortReport('date')">Date ⬍</th>
-            </tr>
-          </thead>
-          <tbody id="report-body">
-            </tbody>
-        </table>
-      </div>
-    </section>
+      </section>
+    </main>
     
-  </main>
-</div>
+<div id="toast-container"></div>
+  </div>
 
+  
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-<script>
-  const USERS = {
-    "Insaf": "INSAF03",
-    "Inzi": "INZI01",
-    "Iltizam": "ILTIZAM05"
-  };
+  <script>
+    const USERS = { "Insaf":"INSAF03", "Inzi":"INZI01", "Iltizam":"ILTIZAM05" };
+    let jobData = [], expenseData = [], calendar;
+    let stats = { total:0, in_progress:0, completed:0, cancelled:0 };
+    let totalIncome=0, totalExpenses=0;
+    let lastChange = null; // To store the last change for undo functionality
 
-  let jobData = [], expenseData = [], calendar;
-  let stats = { total: 0, in_progress: 0, completed: 0, cancelled: 0 };
-  let totalIncome = 0, totalExpenses = 0;
+    // Track which expense is being edited
+    let currentlyEditingExpenseId = null; 
 
-  function login() {
-    const u = document.getElementById("username").value.trim();
-    const p = document.getElementById("password").value.trim();
-    if (USERS[u] === p) {
-      document.getElementById("login-screen").style.display = "none";
-      document.getElementById("app").style.display = "flex";
-      showSection("dashboard");
-      setTimeout(initCalendar, 100);
-    } else {
-      document.getElementById("login-error").classList.remove("hidden");
-    }
-  }
+    // --- LOGIN / LOGOUT ---
+    // Moved login() function here to be globally accessible
+    function login() {
+      console.log("Login function called."); // Debugging line
+      const u = document.getElementById("username").value.trim();
+      const p = document.getElementById("password").value.trim();
 
-  function logout() {
-    document.getElementById("login-screen").style.display = "flex";
-    document.getElementById("app").style.display = "none";
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
-    document.getElementById("login-error").classList.add("hidden");
-  }
-
-  function showSection(id) {
-    document.querySelectorAll("main > section").forEach(sec => sec.classList.add("hidden"));
-    document.getElementById(id).classList.remove("hidden");
-    // Remove active class from all sidebar buttons
-    document.querySelectorAll('.sidebar button').forEach(button => {
-      button.classList.remove('active', 'bg-purple-200', 'text-purple-800', 'font-bold');
-      button.classList.add('text-gray-700');
-    });
-    // Add active class to the clicked button
-    const activeLink = document.querySelector(`.sidebar button[onclick="showSection('${id}')"]`);
-    if (activeLink) {
-      activeLink.classList.add('active', 'bg-purple-200', 'text-purple-800', 'font-bold');
-      activeLink.classList.remove('text-gray-700');
-    }
-
-    if (id === "calendar" && calendar) calendar.render();
-    if (id === "tasks") updateTasks();
-  }
-
-  // Set initial dashboard link to active and set current dates
-  document.addEventListener('DOMContentLoaded', () => {
-    const dashboardLink = document.getElementById('dashboard-link');
-    if (dashboardLink) {
-      dashboardLink.classList.add('active', 'bg-purple-200', 'text-purple-800', 'font-bold');
-      dashboardLink.classList.remove('text-gray-700');
-    }
-
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('order-date').value = today;
-    document.getElementById('expense-date').value = today;
-  });
-
-
-  function initCalendar() {
-    const el = document.getElementById("calendarEl");
-    calendar = new FullCalendar.Calendar(el, {
-      initialView: 'dayGridMonth',
-      height: 600,
-      eventDidMount(info) {
-        const deadline = new Date(info.event.start);
-        const now = new Date();
-        const diff = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
-        if (diff <= 2) info.el.style.backgroundColor = '#fecaca'; // Red-100
-        else if (diff <= 5) info.el.style.backgroundColor = '#fde68a'; // Yellow-100
-        else info.el.style.backgroundColor = '#bbf7d0'; // Green-100
-        info.el.style.borderColor = 'transparent'; // Remove default border
-        info.el.style.color = '#333'; // Darken event text
-        info.el.style.padding = '4px 6px'; // Add padding to event
-        info.el.style.borderRadius = '4px'; // Rounded corners for event
+      console.log("Attempting login with Username:", u, "Password:", p); // Debugging line
+      
+      if (USERS[u] === p) {
+        console.log("Login successful!"); // Debugging line
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app").style.display = "flex";
+        
+        showSection("dashboard");
+      } else {
+        console.log("Login failed: Invalid credentials."); // Debugging line
+        document.getElementById("login-error").classList.remove("hidden");
       }
-    });
-    calendar.render();
-  }
-
-  document.getElementById("job-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    const customer = document.getElementById("customer").value;
-    const phone = document.getElementById("customer-phone").value;
-    const price = parseFloat(document.getElementById("price").value) || 0;
-    const discount = parseFloat(document.getElementById("discount").value) || 0;
-    const orderDate = document.getElementById("order-date").value;
-    const deadline = document.getElementById("deadline").value;
-
-    const details = [...document.querySelectorAll('input[name="details"]:checked')].map(cb => cb.value);
-    const other = document.getElementById("other-details").value;
-    const fullDetails = [...details, other ? `Other: ${other}` : ''].filter(Boolean).join(", ");
-
-    const delivery = document.querySelector('input[name="delivery"]:checked')?.value;
-    let contact = "";
-    if (delivery === "address") contact = document.querySelector("#delivery-address input").value;
-    if (delivery === "email") contact = document.querySelector("#delivery-email input").value;
-    if (delivery === "whatsapp") contact = document.querySelector("#delivery-whatsapp input").value;
-
-    const job = { customer, phone, contact, details: fullDetails, price, discount, orderDate, deadline, status: "in_progress", incomeCounted: true };
-    jobData.push(job);
-    if (calendar) calendar.addEvent({ title: customer, start: deadline, allDay: true });
-
-    stats.total++;
-    stats.in_progress++;
-    totalIncome += (price - discount);
-    updateDashboard();
-    updateTasks();
-    updateReports();
-
-    this.reset();
-    document.getElementById("order-date").value = new Date().toISOString().split("T")[0]; // Re-set current date after reset
-    document.getElementById("total-display").textContent = "Rs. 0.00";
-    // Hide delivery fields after submission
-    toggleDeliveryFields('');
-  });
-
-  document.getElementById("price").addEventListener("input", updateTotal);
-  document.getElementById("discount").addEventListener("input", updateTotal);
-  function updateTotal() {
-    const p = parseFloat(document.getElementById("price").value) || 0;
-    const d = parseFloat(document.getElementById("discount").value) || 0;
-    document.getElementById("total-display").textContent = `Rs. ${(p - d).toFixed(2)}`;
-  }
-
-  function toggleDeliveryFields(type) {
-    document.getElementById("delivery-address").classList.add("hidden");
-    document.getElementById("delivery-email").classList.add("hidden");
-    document.getElementById("delivery-whatsapp").classList.add("hidden");
-    // Also uncheck all radio buttons to ensure a clean state
-    document.querySelectorAll('input[name="delivery"]').forEach(radio => radio.checked = false);
-
-    if (type === "address") document.getElementById("delivery-address").classList.remove("hidden");
-    if (type === "email") document.getElementById("delivery-email").classList.remove("hidden");
-    if (type === "whatsapp") document.getElementById("delivery-whatsapp").classList.remove("hidden");
-    // Re-check the selected radio button
-    if (type) document.querySelector(`input[name="delivery"][value="${type}"]`).checked = true;
-  }
-
-  function updateTasks() {
-    const tbody = document.getElementById("tasks-body");
-    tbody.innerHTML = "";
-    const now = new Date();
-    stats.in_progress = 0;
-    stats.completed = 0;
-    stats.cancelled = 0;
-
-    jobData.forEach((job, idx) => {
-      const age = (now - new Date(job.deadline)) / (1000 * 60 * 60 * 24);
-      // Keep completed jobs for a longer period if desired, or remove filtering for simpler view
-      // if (job.status === "completed" && age > 15) return;
-
-      stats[job.status]++;
-      const row = document.createElement("tr");
-      row.className = job.status === "completed" ? "bg-green-50" :
-                      job.status === "cancelled" ? "bg-red-50" : "bg-yellow-50"; // Lighter shades for rows
-      row.innerHTML = `
-        <td class="border border-gray-200 p-3">${job.customer}</td>
-        <td class="border border-gray-200 p-3">${job.phone}</td>
-        <td class="border border-gray-200 p-3">${job.contact}</td>
-        <td class="border border-gray-200 p-3">${job.details}</td>
-        <td class="border border-gray-200 p-3">Rs. ${job.price.toFixed(2)}</td>
-        <td class="border border-gray-200 p-3">Rs. ${job.discount.toFixed(2)}</td>
-        <td class="border border-gray-200 p-3">${job.deadline}</td>
-        <td class="border border-gray-200 p-3">
-          <select onchange="updateStatus(this, ${idx})" class="p-2 border border-gray-300 rounded-lg bg-white focus:ring-purple-500 focus:border-purple-500">
-            <option value="in_progress" ${job.status === "in_progress" ? "selected" : ""}>In Progress</option>
-            <option value="completed" ${job.status === "completed" ? "selected" : ""}>Completed</option>
-            <option value="cancelled" ${job.status === "cancelled" ? "selected" : ""}>Cancelled</option>
-          </select>
-        </td>
-        <td class="border border-gray-200 p-3"><button class="text-blue-600 hover:text-blue-800 font-semibold">Print</button></td>`;
-      tbody.appendChild(row);
-    });
-    updateDashboard();
-  }
-
-  function updateStatus(select, idx) {
-    const newStatus = select.value;
-    const job = jobData[idx];
-    const prev = job.status;
-    job.status = newStatus;
-
-    if (prev !== "cancelled" && newStatus === "cancelled" && job.incomeCounted) {
-      totalIncome -= (job.price - job.discount);
-      job.incomeCounted = false;
     }
-    if (prev === "cancelled" && newStatus !== "cancelled" && !job.incomeCounted) {
-      totalIncome += (job.price - job.discount);
-      job.incomeCounted = true;
+    
+    function logout() {
+      document.getElementById("app").style.display = "none";
+      document.getElementById("login-screen").style.display = "flex";
+      
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+      
+      document.getElementById("login-error").classList.add("hidden");
     }
-    updateTasks();
-    updateReports();
-    // Update calendar event color if status changes
-    if (calendar) {
-      const event = calendar.getEventById(job.id); // You might need to assign an ID to events for this to work perfectly
-      if (event) {
-        if (newStatus === "completed") {
-          event.setProp('backgroundColor', '#bbf7d0'); // Green
-        } else if (newStatus === "cancelled") {
-          event.setProp('backgroundColor', '#fecaca'); // Red
-        } else {
-          event.setProp('backgroundColor', '#fde68a'); // Yellow
+
+    // --- UTILITY FUNCTIONS ---
+    function showToast(message, isError = false) {
+        const toastContainer = document.getElementById("toast-container");
+        if (!toastContainer) { // Create if not exists (should be in HTML)
+            console.error("Toast container not found!");
+            return;
         }
+        const toast = document.createElement("div");
+        toast.className = `toast-message ${isError ? 'error' : ''}`;
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+
+        // Force reflow for transition to work
+        void toast.offsetWidth; 
+
+        setTimeout(() => {
+            toast.classList.add("show");
+        }, 50); // Small delay to trigger transition
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+            toast.addEventListener('transitionend', () => toast.remove());
+        }, 3000); // Hide after 3 seconds
+    }
+
+    // --- SECTION NAVIGATION (MODIFIED FOR ANIMATION) ---
+    function showSection(id) {
+        const sections = document.querySelectorAll("main > section");
+        sections.forEach(s => {
+            s.style.animation = 'none'; // Clear any previous animation
+            s.offsetHeight; // Trigger reflow
+            s.style.animation = null; // Re-enable animation for next trigger
+
+            if (s.id === id) {
+                s.classList.remove("hidden");
+                // The CSS animation `fadeInUp` will automatically apply on display change
+                // We don't need a separate 'animate-in' class if using `forwards`
+            } else {
+                s.classList.add("hidden"); // Hide other sections immediately
+            }
+        });
+
+        document.querySelectorAll(".sidebar button").forEach(b => {
+            b.classList.remove("active", "bg-purple-200", "text-purple-800", "font-bold");
+            b.classList.add("text-gray-700");
+        });
+        const active = document.querySelector(`.sidebar button[onclick="showSection('${id}')"]`);
+        if (active) active.classList.add("active", "bg-purple-200", "text-purple-800", "font-bold");
+        
+        if (id === "calendar" && calendar) calendar.render(); 
+        if (id === "tasks") updateTasks();
+        if (id === "expenses") updateExpenseTable();
+    }
+
+
+    // --- INITIALIZE DATES & FIRESTORE LISTENERS ---
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set dates
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("order-date").value = today;
+      document.getElementById("expense-date").value = today;
+
+      // Initialize calendar once DOM is ready
+      initCalendar();
+
+      // Firestore: load & listen jobs
+      db.collection("jobs").orderBy("createdAt")
+        .onSnapshot(snap => {
+          console.log("Firestore jobs snapshot received."); // Debugging
+          jobData = []; 
+          totalIncome = 0;
+          
+          // Clear existing events from calendar before adding new ones
+          if (calendar) {
+            calendar.getEvents().forEach(e => e.remove()); 
+          }
+
+          stats = { total: 0, in_progress: 0, completed: 0, cancelled: 0 }; // Reset stats for recalculation
+          
+          snap.forEach(doc => {
+            const j = { id: doc.id, ...doc.data() };
+            jobData.push(j);
+            
+            // Add event to calendar with dynamic class for dynamic styling
+            const todayDate = new Date();
+            todayDate.setHours(0,0,0,0); // Normalize today to start of day
+            const deadlineDate = new Date(j.deadline);
+            deadlineDate.setHours(0,0,0,0); // Normalize deadline to start of day
+
+            const diffTime = deadlineDate.getTime() - todayDate.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Days remaining
+
+            let eventClassName = '';
+            if (diffDays <= 2) {
+              eventClassName = 'fc-event-red';
+            } else if (diffDays <= 5) {
+              eventClassName = 'fc-event-yellow';
+            } else {
+              eventClassName = 'fc-event-green';
+            }
+
+            if (calendar) {
+                calendar.addEvent({
+                    id: j.id,
+                    title: j.customer,
+                    start: j.deadline,
+                    allDay: true,
+                    classNames: [eventClassName] // Apply the class here
+                });
+            }
+            
+            // Calculate income based on incomeCounted status
+            if (j.incomeCounted !== false) { // Only count if not explicitly set to false (e.g., if cancelled)
+                totalIncome += (j.price - j.discount);
+            }
+          });
+
+          // Recalculate stats based on the new jobData
+          jobData.forEach(j => {
+              if (stats[j.status] !== undefined) {
+                  stats[j.status]++;
+              }
+          });
+          stats.total = jobData.length;
+
+          console.log("Job data updated. Calling dashboard and tasks updates."); // Debugging
+          updateDashboard();
+          updateTasks(); // This will re-render the tasks table with updated data
+          updateReports();
+          if (calendar) { // Ensure calendar re-renders after all events are added
+            calendar.render();
+          }
+        }, err => console.error("Jobs listener error:", err));
+
+      // Firestore: load & listen expenses
+      db.collection("expenses").orderBy("createdAt")
+        .onSnapshot(snap => {
+          console.log("Firestore expenses snapshot received."); // Debugging
+          expenseData = [];
+          snap.forEach(doc => expenseData.push({ id: doc.id, ...doc.data() }));
+          totalExpenses = expenseData.reduce((sum, e) => sum + e.amount, 0);
+          updateDashboard(); // Update dashboard for expenses as well
+          updateExpenseTable();
+          updateReports(); // Also update reports after expense data changes
+        }, err => console.error("Expenses listener error:", err));
+    });
+
+    // --- CALENDAR SETUP ---
+    function initCalendar(){
+      const el=document.getElementById("calendarEl");
+      // Only initialize if calendar hasn't been initialized yet
+      if (!calendar) {
+        calendar=new FullCalendar.Calendar(el,{
+          initialView:'dayGridMonth',
+          height:600,
+          eventDidMount: info => {
+              info.el.style.borderColor='transparent'; 
+          },
+        });
+        // Do not render here, render after data is loaded in onSnapshot
       }
     }
-  }
 
-  function updateDashboard() {
-    document.getElementById("stat-total").textContent = stats.total;
-    document.getElementById("stat-progress").textContent = stats.in_progress;
-    document.getElementById("stat-completed").textContent = stats.completed;
-    document.getElementById("stat-cancelled").textContent = stats.cancelled;
-    document.getElementById("income-total").textContent = `Rs. ${totalIncome.toFixed(2)}`;
-    document.getElementById("expense-total").textContent = `Rs. ${totalExpenses.toFixed(2)}`;
-    document.getElementById("profit-total").textContent = `Rs. ${(totalIncome - totalExpenses).toFixed(2)}`;
-  }
+    // --- JOB FORM: write to Firestore ---
+    document.getElementById("job-form").addEventListener("submit",function(e){
+      e.preventDefault();
+      const customer = document.getElementById("customer").value.trim();
+      const phone    = document.getElementById("customer-phone").value.trim();
+      const price    = parseFloat(document.getElementById("price").value)||0;
+      const discount = parseFloat(document.getElementById("discount").value)||0;
+      const orderDate= document.getElementById("order-date").value;
+      const deadline = document.getElementById("deadline").value;
+      const details  = [...document.querySelectorAll('input[name="details"]:checked')].map(cb=>cb.value);
+      const other    = document.getElementById("other-details").value.trim();
+      const fullDetails=[...details, other?`Other: ${other}`:''].filter(Boolean).join(", ");
+      const delivery = document.querySelector('input[name="delivery"]:checked')?.value;
+      let contact="";
+      if(delivery==="address") contact=document.querySelector("#delivery-address input").value.trim();
+      if(delivery==="email")   contact=document.querySelector("#delivery-email input").value.trim();
+      if(delivery==="whatsapp")contact=document.querySelector("#delivery-whatsapp input").value.trim();
 
-  document.getElementById("expense-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    const title = document.getElementById("expense-title").value;
-    const amount = parseFloat(document.getElementById("expense-amount").value) || 0;
-    const date = document.getElementById("expense-date").value;
-    expenseData.push({ title, amount, date });
-    totalExpenses += amount;
-    updateDashboard();
-    updateReports();
-    this.reset();
-    document.getElementById("expense-date").value = new Date().toISOString().split("T")[0];
-  });
+      const job={ customer, phone, contact, details:fullDetails, price, discount, orderDate, deadline, status:"in_progress", incomeCounted:true, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+      
+      db.collection("jobs").add(job)
+        .then((docRef)=> {
+            showToast("Job added successfully!");
+            this.reset();
+            lastChange = { type: 'add', jobId: docRef.id, data: job }; 
+        })
+        .catch(err=> {
+            console.error("Error adding job:",err);
+            showToast("Error adding job.", true);
+        });
+    });
 
-  function updateReports() {
-    const tbody = document.getElementById("report-body");
-    tbody.innerHTML = "";
-    jobData.forEach(j => {
-      // Only include income if not cancelled or if it was counted
-      if (j.status !== "cancelled" || j.incomeCounted) {
-        tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors duration-100">
-          <td class="border border-gray-200 p-3 text-green-700">Income</td>
-          <td class="border border-gray-200 p-3">${j.customer}</td>
-          <td class="border border-gray-200 p-3 font-semibold">Rs. ${(j.price - j.discount).toFixed(2)}</td>
-          <td class="border border-gray-200 p-3">${j.orderDate}</td></tr>`;
+    // --- EXPENSE FORM: write to Firestore ---
+    document.getElementById("expense-form").addEventListener("submit",function(e){
+      e.preventDefault();
+      const title = document.getElementById("expense-title").value.trim();
+      const amount= parseFloat(document.getElementById("expense-amount").value)||0;
+      const date  = document.getElementById("expense-date").value;
+      
+      db.collection("expenses").add({ title, amount, date, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+        .then((docRef)=> {
+            showToast("Expense added successfully!");
+            this.reset();
+            lastChange = { type: 'addExpense', expenseId: docRef.id, data: { title, amount, date } };
+        })
+        .catch(err=> {
+            console.error("Error adding expense:",err);
+            showToast("Error adding expense.", true);
+        });
+    });
+
+    // --- UI UPDATES ---
+    function updateExpenseTable(){
+      const tbody=document.getElementById("expense-body");
+      tbody.innerHTML="";
+      expenseData.forEach(e=>{
+        const row=document.createElement("tr");
+        row.dataset.expenseId = e.id; // Set data attribute for easy ID retrieval
+
+        if (currentlyEditingExpenseId === e.id) {
+            // Render editable row
+            row.innerHTML = `
+              <td class="border p-3"><input type="text" value="${e.title || ''}" class="w-full p-1 border rounded" data-field="title"/></td>
+              <td class="border p-3"><input type="number" value="${(e.amount || 0).toFixed(2)}" class="w-full p-1 border rounded" data-field="amount"/></td>
+              <td class="border p-3"><input type="date" value="${e.date || ''}" class="w-full p-1 border rounded" data-field="date"/></td>
+              <td class="border p-3 whitespace-nowrap">
+                <button onclick="saveEditedExpense('${e.id}')" class="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded-lg text-xs mr-1">Save</button>
+                <button onclick="cancelEditExpense()" class="bg-gray-400 hover:bg-gray-500 text-white py-1 px-2 rounded-lg text-xs">Cancel</button>
+              </td>
+            `;
+        } else {
+            // Render static row
+            row.innerHTML=`
+              <td class="border border-gray-200 p-3">${e.title}</td>
+              <td class="border border-gray-200 p-3">Rs. ${e.amount.toFixed(2)}</td>
+              <td class="border border-gray-200 p-3">${e.date}</td>
+              <td class="border p-3 whitespace-nowrap">
+                <button onclick="editExpense('${e.id}')" class="text-yellow-600 hover:text-yellow-800 font-semibold mr-2">Edit</button>
+                <button onclick="deleteExpense('${e.id}')" class="text-red-600 hover:text-red-800 font-semibold">Delete</button>
+              </td>
+            `;
+        }
+        tbody.appendChild(row);
+      });
+    }
+
+    let currentlyEditingJobId = null; // Track which job is being edited
+
+    function updateTasks(){
+      const tbody=document.getElementById("tasks-body");
+      tbody.innerHTML="";
+      
+      const todayDate = new Date();
+      todayDate.setHours(0,0,0,0); // Normalize today to start of day
+
+      jobData.forEach((job,idx)=>{
+        console.log(`Rendering job: ID=${job.id}, Status=${job.status}, Customer=${job.customer}`); // IMPORTANT DEBUG LOG
+        const row=document.createElement("tr");
+        row.dataset.jobId = job.id; // Set data attribute for easy ID retrieval
+        
+        // Set row background color based on status
+        let rowBgClass = '';
+        let statusTextColor = '';
+        if (job.status === "completed") {
+            rowBgClass = "bg-green-100"; 
+            statusTextColor = "text-green-800";
+        } else if (job.status === "cancelled") {
+            rowBgClass = "bg-red-100";   
+            statusTextColor = "text-red-800";
+        } else { // "in_progress"
+            rowBgClass = "bg-white";    // Keeping it white/default for in progress
+            statusTextColor = "text-gray-800"; // Or any specific color for in-progress text
+        }
+        row.className = rowBgClass;
+
+
+        let contactDisplay = job.contact;
+
+        // Determine deadline highlight class
+        let deadlineClass = '';
+        if (job.deadline) {
+            const deadlineDate = new Date(job.deadline);
+            deadlineDate.setHours(0,0,0,0);
+            const diffTime = deadlineDate.getTime() - todayDate.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Days remaining
+
+            if (diffDays <= 2) {
+                deadlineClass = 'bg-red-200 text-red-800 font-semibold'; // Red for <= 2 days
+            } else if (diffDays <= 5) {
+                deadlineClass = 'bg-yellow-200 text-yellow-800 font-semibold'; // Yellow for <= 5 days
+            } else {
+                deadlineClass = 'bg-green-200 text-green-800 font-semibold'; // Green for > 5 days
+            }
+        }
+
+
+        if (currentlyEditingJobId === job.id) {
+            // Render editable row
+            row.innerHTML = `
+              <td class="border p-3"><input type="text" value="${job.customer || ''}" class="w-full p-1 border rounded" data-field="customer"/></td>
+              <td class="border p-3"><input type="text" value="${job.phone || ''}" class="w-full p-1 border rounded" data-field="phone"/></td>
+              <td class="border p-3"><input type="text" value="${contactDisplay || ''}" class="w-full p-1 border rounded" data-field="contact"/></td>
+              <td class="border p-3"><textarea class="w-full p-1 border rounded text-xs" rows="2" data-field="details">${job.details || ''}</textarea></td>
+              <td class="border p-3"><input type="number" value="${(job.price || 0).toFixed(2)}" class="w-24 p-1 border rounded" data-field="price"/></td>
+              <td class="border p-3"><input type="number" value="${(job.discount || 0).toFixed(2)}" class="w-24 p-1 border rounded" data-field="discount"/></td>
+              <td class="border p-3 ${deadlineClass}"><input type="date" value="${job.deadline || ''}" class="w-full p-1 border rounded ${deadlineClass}" data-field="deadline"/></td>
+              <td class="border p-3">
+                <select class="p-1 border rounded text-xs ${statusTextColor}" data-field="status">
+                  <option value="in_progress"${job.status==="in_progress"?" selected":""}>In Progress</option>
+                  <option value="completed"${job.status==="completed"?" selected":""}>Completed</option>
+                  <option value="cancelled"${job.status==="cancelled"?" selected":""}>Cancelled</option>
+                </select>
+              </td>
+              <td class="border p-3"><button class="text-blue-600 hover:text-blue-800 font-semibold">Print</button></td>
+              <td class="border p-3 whitespace-nowrap">
+                <button onclick="saveEditedJob('${job.id}')" class="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded-lg text-xs mr-1">Save</button>
+                <button onclick="cancelEdit()" class="bg-gray-400 hover:bg-gray-500 text-white py-1 px-2 rounded-lg text-xs">Cancel</button>
+              </td>
+            `;
+        } else {
+            // Render static row
+            row.innerHTML=`
+              <td class="border p-3">${job.customer || ''}</td>
+              <td class="border p-3">${job.phone || ''}</td>
+              <td class="border p-3">${contactDisplay || ''}</td>
+              <td class="border p-3">${job.details || ''}</td>
+              <td class="border p-3">Rs. ${(job.price || 0).toFixed(2)}</td>
+              <td class="border p-3">Rs. ${(job.discount || 0).toFixed(2)}</td>
+              <td class="border p-3 ${deadlineClass}">${job.deadline || ''}</td>
+              <td class="border p-3">
+                <select onchange="updateStatus(this,'${job.id}')" class="p-2 border rounded-lg ${statusTextColor}">
+                  <option value="in_progress"${job.status==="in_progress"?" selected":""}>In Progress</option>
+                  <option value="completed"${job.status==="completed"?" selected":""}>Completed</option>
+                  <option value="cancelled"${job.status==="cancelled"?" selected":""}>Cancelled</option>
+                </select>
+              </td>
+              <td class="border p-3"><button class="text-blue-600 hover:text-blue-800 font-semibold">Print</button></td>
+              <td class="border p-3 whitespace-nowrap">
+                <button onclick="editJob('${job.id}')" class="text-yellow-600 hover:text-yellow-800 font-semibold mr-2">Edit</button>
+                <button onclick="deleteJob('${job.id}')" class="text-red-600 hover:text-red-800 font-semibold">Delete</button>
+              </td>
+            `;
+        }
+        tbody.appendChild(row);
+      });
+    }
+
+    function updateStatus(sel, jobId){
+      const newSt = sel.value;
+      console.log("--- UPDATE STATUS INITIATED ---");
+      console.log("Attempting to update status for jobId:", jobId, "to new status:", newSt);
+
+      const job = jobData.find(j => j.id === jobId);
+      if (!job) {
+          console.error("Job not found in local data for status update:", jobId);
+          showToast("Error: Job not found for status update.", true);
+          return;
       }
-    });
-    expenseData.forEach(e => {
-      tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors duration-100">
-        <td class="border border-gray-200 p-3 text-red-700">Expense</td>
-        <td class="border border-gray-200 p-3">${e.title}</td>
-        <td class="border border-gray-200 p-3 font-semibold">Rs. ${e.amount.toFixed(2)}</td>
-        <td class="border border-gray-200 p-3">${e.date}</td></tr>`;
-    });
-  }
+      console.log("Found job in local data:", job);
 
-  function filterReportByDate() {
-    const from = document.getElementById("report-from").value;
-    const to = document.getElementById("report-to").value;
-    const rows = document.querySelectorAll("#report-body tr");
-    rows.forEach(row => {
-      const date = row.children[3].textContent.trim();
-      row.style.display = (!from || date >= from) && (!to || date <= to) ? "" : "none";
-    });
-  }
+      const prevStatus = job.status;
+      // FIX START: Ensure prevIncomeCounted is always a boolean or has a default if missing
+      const prevIncomeCounted = job.incomeCounted === undefined ? true : job.incomeCounted;
+      // FIX END
 
-  function clearReportFilter() {
-    document.getElementById("report-from").value = "";
-    document.getElementById("report-to").value = "";
-    document.querySelectorAll("#report-body tr").forEach(r => r.style.display = "");
-  }
+      // Store current state for undo before updating
+      lastChange = { type: 'updateStatus', jobId: jobId, prevStatus: prevStatus, newStatus: newSt, prevIncomeCounted: prevIncomeCounted };
+      console.log("Last change for undo set for status update:", lastChange);
 
-  let sortDirection = {};
-  function sortReport(col) {
-    const tbody = document.getElementById("report-body");
-    const rows = Array.from(tbody.querySelectorAll("tr"));
-    const index = { type: 0, title: 1, amount: 2, date: 3 }[col];
-    const dir = sortDirection[col] = !sortDirection[col];
-    rows.sort((a, b) => {
-      let va = a.children[index].textContent.trim();
-      let vb = b.children[index].textContent.trim();
-
-      if (col === 'amount') {
-        va = parseFloat(va.replace('Rs. ', ''));
-        vb = parseFloat(vb.replace('Rs. ', ''));
-        return dir ? va - vb : vb - va;
+      let newIncomeCounted = prevIncomeCounted;
+      if(prevStatus !== "cancelled" && newSt === "cancelled" && newIncomeCounted){
+        newIncomeCounted = false; // If changing from non-cancelled to cancelled, mark income as not counted
+        console.log("Status changed to cancelled, setting incomeCounted to false.");
       }
-      // For date, ensure proper comparison
-      if (col === 'date') {
-        va = new Date(va);
-        vb = new Date(vb);
+      if(prevStatus === "cancelled" && newSt !== "cancelled" && !newIncomeCounted){
+        newIncomeCounted = true; // If changing from cancelled to non-cancelled, mark income as counted
+        console.log("Status changed from cancelled, setting incomeCounted to true.");
       }
       
-      if (va === vb) return 0;
-      return dir ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
-    });
-    rows.forEach(r => tbody.appendChild(r));
-  }
-</script>
+      // Update Firestore
+      db.collection("jobs").doc(jobId).update({ status: newSt, incomeCounted: newIncomeCounted })
+        .then(() => {
+          showToast("Job status updated successfully!");
+          console.log("Successfully updated status in Firestore for jobId:", jobId);
+          // Data will be reloaded by the snapshot listener, which will call updateTasks() and updateDashboard()
+        })
+        .catch(err => {
+            console.error("Error updating status in Firestore for jobId:", jobId, ":", err);
+            showToast("Error updating status.", true);
+        });
+      console.log("--- UPDATE STATUS ENDED ---");
+    }
+
+    function deleteJob(jobId) {
+      console.log("--- DELETE JOB INITIATED ---");
+      console.log("Job ID received for deletion:", jobId);
+
+      if (!jobId) {
+        console.error("Delete function called with an invalid/empty jobId.");
+        showToast("Error: Cannot delete job without a valid ID.", true);
+        return;
+      }
+
+      if (confirm("Are you sure you want to delete this job? This action cannot be undone unless you click Undo Last Change right after.")) {
+        const jobToDelete = jobData.find(j => j.id === jobId);
+        if (!jobToDelete) {
+          console.warn("Job not found in local jobData for deletion (ID:", jobId, "). It might have already been deleted or data is out of sync.");
+          // Attempt to delete from Firestore anyway, just in case local data is stale
+        } else {
+            console.log("Found job in local data to delete:", jobToDelete);
+        }
+
+        // Store current state for undo before deleting
+        // Store the full job object, including its ID, for re-creation
+        lastChange = { type: 'delete', data: jobToDelete || { id: jobId } }; 
+        console.log("Last change for undo set:", lastChange);
+
+        db.collection("jobs").doc(jobId).delete()
+          .then(() => {
+            console.log("Job successfully deleted from Firestore:", jobId);
+            showToast("Job successfully deleted!");
+            // The Firestore snapshot listener will automatically update jobData and re-render the table
+          })
+          .catch(err => {
+              console.error("Error removing job from Firestore (ID:", jobId, "):", err);
+              showToast("Error deleting job: " + err.message, true); // Show actual error message
+          });
+      } else {
+        console.log("Deletion cancelled by user.");
+      }
+      console.log("--- DELETE JOB ENDED ---");
+    }
+
+    function editJob(jobId) {
+        // Set the job ID that is currently being edited
+        currentlyEditingJobId = jobId;
+        updateTasks(); // Re-render the tasks table to show the editable row
+    }
+
+    function cancelEdit() {
+        currentlyEditingJobId = null; // Clear editing state
+        updateTasks(); // Re-render to show static rows again
+    }
+
+    function saveEditedJob(jobId) {
+        const row = document.querySelector(`tr[data-job-id="${jobId}"]`);
+        if (!row) return;
+
+        const originalJob = jobData.find(j => j.id === jobId);
+        if (!originalJob) return;
+
+        // Get values from the input fields in the editable row
+        const customer = row.querySelector('[data-field="customer"]').value.trim();
+        const phone = row.querySelector('[data-field="phone"]').value.trim();
+        const contact = row.querySelector('[data-field="contact"]').value.trim();
+        const details = row.querySelector('[data-field="details"]').value.trim();
+        const price = parseFloat(row.querySelector('[data-field="price"]').value) || 0;
+        const discount = parseFloat(row.querySelector('[data-field="discount"]').value) || 0;
+        const deadline = row.querySelector('[data-field="deadline"]').value;
+        const status = row.querySelector('[data-field="status"]').value;
+
+        const updatedData = { customer, phone, contact, details, price, discount, deadline, status };
+
+        // Handle incomeCounted logic based on status change
+        // Ensure originalJob.incomeCounted is a boolean for this comparison
+        const originalIncomeCounted = originalJob.incomeCounted === undefined ? true : originalJob.incomeCounted;
+        let newIncomeCounted = originalIncomeCounted;
+
+        if (originalJob.status !== "cancelled" && status === "cancelled" && newIncomeCounted) {
+            newIncomeCounted = false;
+        } else if (originalJob.status === "cancelled" && status !== "cancelled" && !newIncomeCounted) {
+            newIncomeCounted = true;
+        }
+        updatedData.incomeCounted = newIncomeCounted;
+
+        // Store original data for undo
+        lastChange = { type: 'edit', jobId: jobId, originalData: { ...originalJob }, updatedData: { ...updatedData } }; // Create copies
+
+        db.collection("jobs").doc(jobId).update(updatedData)
+            .then(() => {
+                showToast("Job updated successfully!");
+                currentlyEditingJobId = null; // Exit edit mode
+                // The snapshot listener will re-render tasks
+            })
+            .catch(err => {
+                console.error("Error updating job:", err);
+                showToast("Error updating job.", true);
+            });
+    }
+
+    // --- EXPENSE CRUD FUNCTIONS ---
+
+    function editExpense(expenseId) {
+        currentlyEditingExpenseId = expenseId;
+        updateExpenseTable(); // Re-render the expense table to show the editable row
+    }
+
+    function cancelEditExpense() {
+        currentlyEditingExpenseId = null; // Clear editing state
+        updateExpenseTable(); // Re-render to show static rows again
+    }
+
+    function saveEditedExpense(expenseId) {
+        const row = document.querySelector(`tr[data-expense-id="${expenseId}"]`);
+        if (!row) return;
+
+        const originalExpense = expenseData.find(e => e.id === expenseId);
+        if (!originalExpense) return;
+
+        const title = row.querySelector('[data-field="title"]').value.trim();
+        const amount = parseFloat(row.querySelector('[data-field="amount"]').value) || 0;
+        const date = row.querySelector('[data-field="date"]').value;
+
+        const updatedData = { title, amount, date };
+
+        // Store original data for undo
+        lastChange = { type: 'editExpense', expenseId: expenseId, originalData: { ...originalExpense }, updatedData: { ...updatedData } }; // Create copies
+
+        db.collection("expenses").doc(expenseId).update(updatedData)
+            .then(() => {
+                showToast("Expense updated successfully!");
+                currentlyEditingExpenseId = null; // Exit edit mode
+                // The snapshot listener will re-render expenses
+            })
+            .catch(err => {
+                console.error("Error updating expense:", err);
+                showToast("Error updating expense.", true);
+            });
+    }
+
+    function deleteExpense(expenseId) {
+        console.log("--- DELETE EXPENSE INITIATED ---");
+        console.log("Expense ID received for deletion:", expenseId);
+
+        if (!expenseId) {
+            console.error("Delete function called with an invalid/empty expenseId.");
+            showToast("Error: Cannot delete expense without a valid ID.", true);
+            return;
+        }
+
+        if (confirm("Are you sure you want to delete this expense? This action cannot be undone unless you click Undo Last Change right after.")) {
+            const expenseToDelete = expenseData.find(e => e.id === expenseId);
+            if (!expenseToDelete) {
+                console.warn("Expense not found in local expenseData for deletion (ID:", expenseId, "). It might have already been deleted or data is out of sync.");
+            } else {
+                console.log("Found expense in local data to delete:", expenseToDelete);
+            }
+
+            // Store current state for undo before deleting
+            lastChange = { type: 'deleteExpense', data: expenseToDelete || { id: expenseId } }; 
+            console.log("Last change for undo set:", lastChange);
+
+            db.collection("expenses").doc(expenseId).delete()
+                .then(() => {
+                    console.log("Expense successfully deleted from Firestore:", expenseId);
+                    showToast("Expense successfully deleted!");
+                    // The Firestore snapshot listener will automatically update expenseData and re-render the table
+                })
+                .catch(err => {
+                    console.error("Error removing expense from Firestore (ID:", expenseId, "):", err);
+                    showToast("Error deleting expense: " + err.message, true); 
+                });
+        } else {
+            console.log("Expense deletion cancelled by user.");
+        }
+        console.log("--- DELETE EXPENSE ENDED ---");
+    }
+
+    function undoLastChange() {
+        if (!lastChange) {
+            showToast("No changes to undo!", true);
+            return;
+        }
+
+        console.log("Attempting to undo last change:", lastChange); // Debugging
+
+        if (lastChange.type === 'delete') {
+            // Undo job deletion
+            if (lastChange.data && lastChange.data.id) {
+                const dataToRestore = { ...lastChange.data };
+                // IMPORTANT FIX: Remove Firestore's serverTimestamp field before restoring
+                delete dataToRestore.createdAt; // <--- This line is the fix
+
+                db.collection("jobs").doc(lastChange.data.id).set(dataToRestore, { merge: true })
+                    .then(() => {
+                        showToast("Last job deletion undone!");
+                        lastChange = null; // Clear undo state
+                    })
+                    .catch(err => {
+                        console.error("Error undoing job deletion:", err);
+                        showToast("Error undoing job deletion.", true);
+                    });
+            } else {
+                showToast("Cannot undo job deletion: Original job data (including ID) not found for restore.", true);
+                console.error("Cannot undo job deletion: lastChange.data or lastChange.data.id is missing.", lastChange);
+            }
+        } else if (lastChange.type === 'updateStatus') {
+            // Revert status of the job
+            db.collection("jobs").doc(lastChange.jobId).update({ status: lastChange.prevStatus, incomeCounted: lastChange.prevIncomeCounted })
+                .then(() => {
+                    showToast("Last status change undone!");
+                    lastChange = null;
+                })
+                .catch(err => {
+                    console.error("Error undoing status update:", err);
+                    showToast("Error undoing status update.", true);
+                });
+        } else if (lastChange.type === 'edit') {
+            // Revert edited job to its original state
+            db.collection("jobs").doc(lastChange.jobId).update(lastChange.originalData)
+                .then(() => {
+                    showToast("Last job edit undone!");
+                    lastChange = null;
+                })
+                .catch(err => {
+                    console.error("Error undoing job edit:", err);
+                    showToast("Error undoing job edit.", true);
+                });
+        } else if (lastChange.type === 'add') {
+            // Delete the last added job by its ID
+            db.collection("jobs").doc(lastChange.jobId).delete()
+                .then(() => {
+                    showToast("Last job addition undone!");
+                    lastChange = null;
+                })
+                .catch(err => {
+                    console.error("Error undoing job add:", err);
+                    showToast("Error undoing job add.", true);
+                });
+        } else if (lastChange.type === 'addExpense') {
+            // Delete the last added expense by its ID
+            db.collection("expenses").doc(lastChange.expenseId).delete()
+                .then(() => {
+                    showToast("Last expense addition undone!");
+                    lastChange = null;
+                })
+                .catch(err => {
+                    console.error("Error undoing expense add:", err);
+                    showToast("Error undoing expense add.", true);
+                });
+        } else if (lastChange.type === 'deleteExpense') {
+            // Undo expense deletion
+            if (lastChange.data && lastChange.data.id) {
+                const dataToRestore = { ...lastChange.data };
+                // IMPORTANT FIX: Remove Firestore's serverTimestamp field before restoring
+                delete dataToRestore.createdAt; // <--- This line is the fix for expenses as well
+
+                db.collection("expenses").doc(lastChange.data.id).set(dataToRestore, { merge: true })
+                    .then(() => {
+                        showToast("Last expense deletion undone!");
+                        lastChange = null; // Clear undo state
+                    })
+                    .catch(err => {
+                        console.error("Error undoing expense deletion:", err);
+                        showToast("Error undoing expense deletion.", true);
+                    });
+            } else {
+                showToast("Cannot undo expense deletion: Original expense data (including ID) not found for restore.", true);
+                console.error("Cannot undo expense deletion: lastChange.data or lastChange.data.id is missing.", lastChange);
+            }
+        } else if (lastChange.type === 'editExpense') {
+            // Revert edited expense to its original state
+            db.collection("expenses").doc(lastChange.expenseId).update(lastChange.originalData)
+                .then(() => {
+                    showToast("Last expense edit undone!");
+                    lastChange = null;
+                })
+                .catch(err => {
+                    console.error("Error undoing expense edit:", err);
+                    showToast("Error undoing expense edit.", true);
+                });
+        }
+    }
+
+    function updateReports(){
+      const tb=document.getElementById("report-body");
+      tb.innerHTML="";
+      jobData.forEach(j=>{
+        // Only include jobs that are not cancelled OR were cancelled but their income was still counted (edge case, usually incomeCounted would be false if cancelled)
+        if(j.incomeCounted !== false){ // Use incomeCounted to decide if it affects report income
+          tb.innerHTML+=`
+            <tr class="hover:bg-gray-50">
+              <td class="border p-3 text-green-700">Income</td>
+              <td class="border p-3">${j.customer || ''}</td>
+              <td class="border p-3 font-semibold">Rs. ${(j.price-j.discount).toFixed(2)}</td>
+              <td class="border p-3">${j.orderDate || ''}</td>
+            </tr>`;
+        }
+      });
+      expenseData.forEach(e=>{
+        tb.innerHTML+=`
+          <tr class="hover:bg-gray-50">
+            <td class="border p-3 text-red-700">Expense</td>
+            <td class="border p-3">${e.title || ''}</td>
+            <td class="border p-3 font-semibold">Rs. ${e.amount.toFixed(2)}</td>
+            <td class="border p-3">${e.date || ''}</td>
+          </tr>`;
+      });
+    }
+
+    function filterReportByDate(){
+      const from=document.getElementById("report-from").value;
+      const to  =document.getElementById("report-to").value;
+      document.querySelectorAll("#report-body tr").forEach(r=>{
+        const d=r.children[3].textContent.trim();
+        r.style.display = (!from||d>=from) && (!to||d<=to) ? "" : "none";
+      });
+    }
+    function clearReportFilter(){
+      document.getElementById("report-from").value="";
+      document.getElementById("report-to").value="";
+      document.querySelectorAll("#report-body tr").forEach(r=>r.style.display="");
+    }
+
+    // SIMPLE SORT FOR REPORT TABLE
+    let sortDir={};
+    function sortReport(col){
+      const idx={type:0,title:1,amount:2,date:3}[col];
+      const tb=document.getElementById("report-body");
+      const rows=Array.from(tb.querySelectorAll("tr"));
+      const dir= sortDir[col] = !sortDir[col];
+      rows.sort((a,b)=>{
+        let va=a.children[idx].textContent.trim();
+        let vb=b.children[idx].textContent.trim();
+        if(col==="amount"){
+          va=parseFloat(va.replace(/[^\d.]/g,""));
+          vb=parseFloat(vb.replace(/[^\d.]/g,""));
+          return dir?va-vb:vb-va;
+        }
+        if(col==="date"){
+          va=new Date(va); vb=new Date(vb);
+        }
+        return dir?(va>vb?1:-1):(va<vb?1:-1);
+      });
+      rows.forEach(r=>tb.appendChild(r));
+    }
+
+    function updateDashboard(){
+      document.getElementById("stat-total").textContent   = stats.total;
+      document.getElementById("stat-progress").textContent= stats.in_progress;
+      document.getElementById("stat-completed").textContent= stats.completed;
+      document.getElementById("stat-cancelled").textContent= stats.cancelled;
+      document.getElementById("income-total").textContent = `Rs. ${totalIncome.toFixed(2)}`;
+      document.getElementById("expense-total").textContent= `Rs. ${totalExpenses.toFixed(2)}`;
+      document.getElementById("profit-total").textContent = `Rs. ${(totalIncome-totalExpenses).toFixed(2)}`;
+    }
+
+    // Initialize the total display on job order form
+    document.getElementById("price").addEventListener("input", updateTotalDisplay);
+    document.getElementById("discount").addEventListener("input", updateTotalDisplay);
+
+    function updateTotalDisplay() {
+        const price = parseFloat(document.getElementById("price").value) || 0;
+        const discount = parseFloat(document.getElementById("discount").value) || 0;
+        const total = price - discount;
+        document.getElementById("total-display").textContent = `Rs. ${total.toFixed(2)}`;
+    }
+    // Also call it once on load to ensure it's calculated if there are default values
+    document.addEventListener('DOMContentLoaded', updateTotalDisplay);
+
+    // This function is for the "New Job Order" section's delivery fields.
+    function toggleDeliveryFields(type) {
+        document.getElementById("delivery-address").classList.add("hidden");
+        document.getElementById("delivery-email").classList.add("hidden");
+        document.getElementById("delivery-whatsapp").classList.add("hidden");
+        // Clear previous values when toggling
+        document.querySelector("#delivery-address input").value = "";
+        document.querySelector("#delivery-email input").value = "";
+        document.querySelector("#delivery-whatsapp input").value = "";
+
+        if (type === "address") {
+            document.getElementById("delivery-address").classList.remove("hidden");
+        } else if (type === "email") {
+            document.getElementById("delivery-email").classList.remove("hidden");
+        } else if (type === "whatsapp") {
+            document.getElementById("delivery-whatsapp").classList.remove("hidden");
+        }
+    }
+  </script>
 </body>
 </html>
 ```
