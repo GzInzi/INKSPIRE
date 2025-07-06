@@ -1016,7 +1016,10 @@
                         hoverOffset: 4
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                // *** FIX: REMOVED "maintainAspectRatio: false" to prevent floating/stretching ***
+                options: { 
+                    responsive: true
+                }
             });
         }
     }
@@ -1223,4 +1226,3 @@
   </script>
 </body>
 </html>
-```
