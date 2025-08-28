@@ -220,26 +220,44 @@
         cursor: not-allowed;
         opacity: 0.5;
     }
+
+    /* New: Intro Animation */
+    @keyframes netflix-intro {
+        0% { transform: scale(0); opacity: 0; }
+        40% { transform: scale(1.1); opacity: 1; }
+        60% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    #splash-logo {
+        animation: netflix-intro 1.5s ease-out forwards;
+    }
   </style>
 </head>
 
 <body class="bg-gray-50 text-gray-800">
+
+<div id="splash-screen" class="fixed inset-0 bg-white flex justify-center items-center z-50">
+    <img src="LOGO.png" id="splash-logo" alt="INKSPIRE Logo" class="w-64 h-auto transform scale-0 opacity-0">
+</div>
   
-<div id="login-screen" class="flex items-center justify-center h-screen bg-gradient-to-br from-purple-600 to-indigo-700">
+<div id="login-screen" class="hidden flex items-center justify-center h-screen bg-gradient-to-br from-purple-600 to-indigo-700">
     <div class="bg-white p-10 rounded-xl shadow-2xl w-full max-w-sm transform transition-all duration-300 hover:scale-105">
       <h2 class="text-3xl font-extrabold text-center text-purple-700 mb-8">INKSPIRE Login</h2>
       <input id="username" type="text" placeholder="Username" class="w-full px-5 py-3 border border-gray-300 rounded-lg mb-4 focus:ring-purple-500 focus:border-purple-500"/>
-      <input id="password" type="password" placeholder="Password" class="w-full px-5 py-3 border border-gray-300 rounded-lg mb-6 focus:ring-purple-500 focus:border-purple-500"/>
+      <input id="password" type="password" placeholder="Password" class="w-full px-5 py-3 border border-gray-300 rounded-lg mb-4 focus:ring-purple-500 focus:border-purple-500"/>
+      <label class="flex items-center text-sm text-gray-600 mb-6">
+          <input type="checkbox" id="remember-me" class="form-checkbox h-4 w-4 text-purple-600 rounded">
+          <span class="ml-2">Remember Me</span>
+      </label>
       <button onclick="login()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg">Login</button>
       <p id="login-error" class="text-red-500 mt-5 text-center hidden">Invalid credentials. Try again.</p>
     </div>
   </div>
-
   
-<div id="app" class="hidden relative h-screen md:flex">
+<div id="app" class="hidden relative h-screen flex">
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
 
-    <aside id="sidebar" class="w-64 bg-white shadow-xl p-6 space-y-6 flex flex-col justify-between fixed inset-y-0 left-0 z-30 transform -translate-x-full transition-transform duration-300 ease-in-out md:relative md:translate-x-0">
+    <aside id="sidebar" class="w-64 bg-white shadow-xl p-6 space-y-6 flex flex-col justify-between fixed inset-y-0 left-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out md:relative md:translate-x-0">
       <div>
         <div class="mb-6">
             <img src="LOGO.png" alt="INKSPIRE Logo" class="w-full h-auto max-h-20 object-contain">
@@ -261,13 +279,8 @@
     </aside>
 
     <div class="flex-1 flex flex-col h-screen">
-        <header class="md:hidden flex justify-between items-center bg-white p-4 shadow-md z-10">
+        <header class="md:hidden flex items-center justify-center bg-white p-4 shadow-md z-10">
             <h2 id="mobile-header-title" class="text-lg font-bold text-purple-700">Dashboard</h2>
-            <button onclick="toggleSidebar()" class="p-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
         </header>
 
         <main class="flex-1 p-4 md:p-8 space-y-10 overflow-y-auto bg-gray-100">
@@ -476,13 +489,13 @@
           <table class="w-full bg-white shadow-md rounded-lg text-sm border-collapse">
             <thead class="bg-gray-100">
               <tr>
-                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Customer</th>
+                <th onclick="sortTasks('customer')" class="cursor-pointer border border-gray-200 p-3 text-left text-gray-600 font-semibold">Customer <span class="sort-indicator"></span></th>
                 <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Phone</th>
                 <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Contact</th>
                 <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Details</th>
-                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Price</th>
+                <th onclick="sortTasks('price')" class="cursor-pointer border border-gray-200 p-3 text-left text-gray-600 font-semibold">Price <span class="sort-indicator"></span></th>
                 <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Discount</th>
-                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Deadline</th>
+                <th onclick="sortTasks('deadline')" class="cursor-pointer border border-gray-200 p-3 text-left text-gray-600 font-semibold">Deadline <span class="sort-indicator"></span></th>
                 <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Status</th>
                 <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Paid Status</th>
                 <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Invoice</th>
@@ -505,7 +518,7 @@
       
 <section id="earnings" class="hidden section-transition bg-white p-6 rounded-xl shadow-lg">
         <h2 class="text-2xl font-bold text-purple-700 mb-6">💰 Earnings</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
           <div class="dashboard-card bg-white p-5 rounded-lg shadow-md text-center border border-gray-100">
             <p class="text-gray-500 text-sm">Income</p>
             <h3 class="text-3xl font-extrabold text-green-600 mt-1" id="income-total">Rs. 0.00</h3>
@@ -516,7 +529,11 @@
           </div>
           <div class="dashboard-card bg-white p-5 rounded-lg shadow-md text-center border border-gray-100">
             <p class="text-gray-500 text-sm">Profit</p>
-            <h3 class="text-3xl font-extrabold text-blue-600 mt-1" id="profit-total">Rs. ${(totalIncome-totalExpenses).toFixed(2)}</h3>
+            <h3 class="text-3xl font-extrabold text-blue-600 mt-1" id="profit-total">Rs. 0.00</h3>
+          </div>
+           <div class="dashboard-card bg-white p-5 rounded-lg shadow-md text-center border border-gray-100">
+            <p class="text-gray-500 text-sm">Money to be Collected</p>
+            <h3 class="text-3xl font-extrabold text-yellow-500 mt-1" id="money-to-be-collected">Rs. 0.00</h3>
           </div>
         </div>
       </section>
@@ -598,6 +615,11 @@
         </div>
       </section>
         </main>
+      <button onclick="toggleSidebar()" class="md:hidden fixed bottom-4 left-4 z-40 bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
     </div>
     
   <div id="toast-container"></div>
@@ -657,10 +679,11 @@
     .catch(err => console.error("Firebase Auth error:", err));
   
   const USERS = { "Insaf":"INSAF03", "Inzi":"INZI01", "Iltizam":"ILTIZAM05" };
-  let jobData = [], expenseData = [], calendar;
+  let jobData = [], originalJobData = [], expenseData = [], calendar;
   let stats = { total:0, in_progress:0, completed:0, cancelled:0 };
-  let totalIncome=0, totalExpenses=0;
+  let totalIncome=0, totalExpenses=0, moneyToBeCollected = 0;
   let lastChange = null;
+  let currentTaskSortKey = null;
 
   let currentlyEditingExpenseId = null; 
   let currentPage = 1;
@@ -668,14 +691,39 @@
   let incomeExpenseChart;
   let jobStatusChart;
 
-  // --- LOGIN / LOGOUT ---
+  // --- STARTUP & LOGIN ---
+  window.onload = () => {
+      setTimeout(() => {
+          const splashScreen = document.getElementById('splash-screen');
+          // More reliable way to hide the splash screen
+          splashScreen.style.display = 'none';
+          checkPersistentLogin();
+      }, 2000); // Keep this duration simple and reliable
+  };
+
+  function checkPersistentLogin() {
+      const savedUser = localStorage.getItem('inkspireUser');
+      if (savedUser && USERS[savedUser]) {
+          document.getElementById("login-screen").classList.add('hidden');
+          document.getElementById("app").classList.remove('hidden');
+          showSection("dashboard");
+      } else {
+          document.getElementById("login-screen").classList.remove('hidden');
+      }
+  }
+
   function login() {
     const u = document.getElementById("username").value.trim();
     const p = document.getElementById("password").value.trim();
     
     if (USERS[u] === p) {
-      document.getElementById("login-screen").style.display = "none";
-      document.getElementById("app").style.display = "flex";
+      if (document.getElementById('remember-me').checked) {
+          localStorage.setItem('inkspireUser', u);
+      } else {
+          localStorage.removeItem('inkspireUser');
+      }
+      document.getElementById("login-screen").classList.add('hidden');
+      document.getElementById("app").classList.remove('hidden');
       showSection("dashboard");
     } else {
       document.getElementById("login-error").classList.remove("hidden");
@@ -683,8 +731,9 @@
   }
   
   function logout() {
-    document.getElementById("app").style.display = "none";
-    document.getElementById("login-screen").style.display = "flex";
+    localStorage.removeItem('inkspireUser');
+    document.getElementById("app").classList.add('hidden');
+    document.getElementById("login-screen").classList.remove('hidden');
     document.getElementById("username").value = "";
     document.getElementById("password").value = "";
     document.getElementById("login-error").classList.add("hidden");
@@ -773,6 +822,7 @@
       .onSnapshot(snap => {
         jobData = []; 
         totalIncome = 0;
+        moneyToBeCollected = 0;
         
         if (calendar) {
           calendar.getEvents().forEach(e => e.remove()); 
@@ -784,6 +834,10 @@
           const j = { id: doc.id, ...doc.data() };
           jobData.push(j);
           
+          if (j.amountRemaining && j.amountRemaining > 0) {
+              moneyToBeCollected += j.amountRemaining;
+          }
+
           const todayDate = new Date();
           todayDate.setHours(0,0,0,0); 
           const deadlineDate = new Date(j.deadline);
@@ -805,6 +859,7 @@
               totalIncome += (j.price - j.discount);
           }
         });
+        originalJobData = [...jobData];
 
         jobData.forEach(j => {
             if (stats[j.status] !== undefined) stats[j.status]++;
@@ -967,7 +1022,20 @@
     expenseData.forEach(e=>{
       const row=document.createElement("tr");
       row.dataset.expenseId = e.id;
-      row.innerHTML=`<td class="border border-gray-200 p-3">${e.title}</td><td class="border border-gray-200 p-3">Rs. ${e.amount.toFixed(2)}</td><td class="border border-gray-200 p-3">${e.date}</td><td class="border p-3 whitespace-nowrap"><button onclick="editExpense('${e.id}')" class="text-yellow-600 hover:text-yellow-800 font-semibold mr-2">Edit</button><button onclick="deleteExpense('${e.id}')" class="text-red-600 hover:text-red-800 font-semibold">Delete</button></td>`;
+      
+      if (currentlyEditingExpenseId === e.id) {
+          row.innerHTML = `
+              <td class="border p-2"><input type="text" class="edit-title w-full p-2 border rounded" value="${e.title}"></td>
+              <td class="border p-2"><input type="number" class="edit-amount w-full p-2 border rounded" value="${e.amount}"></td>
+              <td class="border p-2"><input type="date" class="edit-date w-full p-2 border rounded" value="${e.date}"></td>
+              <td class="border p-2 whitespace-nowrap">
+                  <button onclick="saveEditedExpense('${e.id}')" class="text-green-600 hover:text-green-800 font-semibold mr-2">Save</button>
+                  <button onclick="cancelEditExpense()" class="text-gray-600 hover:text-gray-800 font-semibold">Cancel</button>
+              </td>
+          `;
+      } else {
+          row.innerHTML=`<td class="border border-gray-200 p-3">${e.title}</td><td class="border border-gray-200 p-3">Rs. ${e.amount.toFixed(2)}</td><td class="border border-gray-200 p-3">${e.date}</td><td class="border p-3 whitespace-nowrap"><button onclick="editExpense('${e.id}')" class="text-yellow-600 hover:text-yellow-800 font-semibold mr-2">Edit</button><button onclick="deleteExpense('${e.id}')" class="text-red-600 hover:text-red-800 font-semibold">Delete</button></td>`;
+      }
       tbody.appendChild(row);
     });
   }
@@ -1094,6 +1162,32 @@
   }
 
   // --- ACTIONS ---
+  function sortTasks(key) {
+      const indicatorSpans = document.querySelectorAll('.sort-indicator');
+      indicatorSpans.forEach(span => span.textContent = '');
+
+      if (currentTaskSortKey === key) {
+          jobData = [...originalJobData];
+          currentTaskSortKey = null;
+      } else {
+          jobData.sort((a, b) => {
+              let valA = a[key] === undefined ? '' : a[key];
+              let valB = b[key] === undefined ? '' : b[key];
+              
+              if (typeof valA === 'number') {
+                  return valA - valB;
+              }
+              return String(valA).localeCompare(String(valB));
+          });
+          currentTaskSortKey = key;
+          const activeIndicator = document.querySelector(`th[onclick="sortTasks('${key}')"] .sort-indicator`);
+          if(activeIndicator) activeIndicator.textContent = ' ⬍';
+      }
+      
+      currentPage = 1;
+      updateTasks();
+  }
+
   function viewTask(jobId) {
       showSection('tasks');
       setTimeout(() => { 
@@ -1155,6 +1249,41 @@
       currentlyEditingJobId = jobId;
       updateTasks();
   }
+
+    function editExpense(expenseId) {
+        currentlyEditingExpenseId = expenseId;
+        updateExpenseTable();
+    }
+
+    function cancelEditExpense() {
+        currentlyEditingExpenseId = null;
+        updateExpenseTable();
+    }
+
+    function saveEditedExpense(expenseId) {
+        const row = document.querySelector(`#expense-body tr[data-expense-id="${expenseId}"]`);
+        const newTitle = row.querySelector('.edit-title').value.trim();
+        const newAmount = parseFloat(row.querySelector('.edit-amount').value) || 0;
+        const newDate = row.querySelector('.edit-date').value;
+
+        if (!newTitle || !newDate || isNaN(newAmount)) {
+            showToast("Please fill all fields correctly.", true);
+            return;
+        }
+
+        db.collection("expenses").doc(expenseId).update({
+            title: newTitle,
+            amount: newAmount,
+            date: newDate
+        }).then(() => {
+            showToast("Expense updated successfully!");
+            currentlyEditingExpenseId = null;
+            // The onSnapshot listener will automatically re-render the table.
+        }).catch(err => {
+            showToast("Error updating expense.", true);
+            console.error("Error updating expense:", err);
+        });
+    }
 
   function deleteJob(jobId) {
       if (!confirm("Are you sure you want to delete this job permanently?")) return;
@@ -1308,6 +1437,7 @@
     document.getElementById("income-total").textContent = `Rs. ${totalIncome.toFixed(2)}`;
     document.getElementById("expense-total").textContent= `Rs. ${totalExpenses.toFixed(2)}`;
     document.getElementById("profit-total").textContent = `Rs. ${(totalIncome-totalExpenses).toFixed(2)}`;
+    document.getElementById("money-to-be-collected").textContent = `Rs. ${moneyToBeCollected.toFixed(2)}`;
 
     const today = new Date().toISOString().split("T")[0];
     const dueTodayCount = jobData.filter(job => job.status === 'in_progress' && job.deadline === today).length;
