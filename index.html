@@ -236,8 +236,10 @@
   </div>
 
   
-<div id="app" class="hidden flex h-screen">
-    <aside class="w-64 bg-white shadow-xl p-6 space-y-6 flex flex-col justify-between">
+<div id="app" class="hidden relative h-screen md:flex">
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
+
+    <aside id="sidebar" class="w-64 bg-white shadow-xl p-6 space-y-6 flex flex-col justify-between fixed inset-y-0 left-0 z-30 transform -translate-x-full transition-transform duration-300 ease-in-out md:relative md:translate-x-0">
       <div>
         <div class="mb-6">
             <img src="LOGO.png" alt="INKSPIRE Logo" class="w-full h-auto max-h-20 object-contain">
@@ -258,8 +260,18 @@
       <button onclick="logout()" class="block text-left w-full text-red-600 hover:text-red-800 py-2 px-3 rounded-lg bg-red-50 hover:bg-red-100 transition-colors duration-200 mt-auto">🚪 Logout</button>
     </aside>
 
-    <main class="flex-1 p-8 space-y-10 overflow-y-auto bg-gray-100">
-      
+    <div class="flex-1 flex flex-col h-screen">
+        <header class="md:hidden flex justify-between items-center bg-white p-4 shadow-md z-10">
+            <h2 id="mobile-header-title" class="text-lg font-bold text-purple-700">Dashboard</h2>
+            <button onclick="toggleSidebar()" class="p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </header>
+
+        <main class="flex-1 p-4 md:p-8 space-y-10 overflow-y-auto bg-gray-100">
+            
 <section id="dashboard" class="hidden section-transition">
         <h2 class="text-2xl font-bold text-purple-700 mb-6">📊 Dashboard</h2>
 
@@ -512,7 +524,8 @@
           </table>
         </div>
       </section>
-    </main>
+        </main>
+    </div>
     
   <div id="toast-container"></div>
 </div>
@@ -624,7 +637,14 @@
       }, 5000);
   }
 
-  // --- SECTION NAVIGATION ---
+  // --- SECTION NAVIGATION & SIDEBAR ---
+  function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+  }
+
   function showSection(id, jobIdToHighlight = null) {
       document.querySelectorAll("main > section").forEach(s => {
           s.style.animation = 'none';
@@ -639,19 +659,24 @@
       });
 
       document.querySelectorAll(".sidebar button").forEach(b => {
-          b.classList.remove("active", "bg-purple-200", "text-purple-800", "font-bold");
-          b.classList.add("text-gray-700");
+          b.classList.remove("active");
       });
-      const active = document.querySelector(`.sidebar button[onclick^="showSection('${id}')"]`);
-      if (active) active.classList.add("active", "bg-purple-200", "text-purple-800", "font-bold");
+      const activeLink = document.querySelector(`.sidebar button[onclick^="showSection('${id}')"]`);
+      if (activeLink) {
+        activeLink.classList.add("active");
+        document.getElementById('mobile-header-title').textContent = activeLink.textContent;
+      }
       
       if (id === "calendar" && calendar) calendar.render(); 
-      if (id === "tasks") {
-          updateTasks();
-      }
+      if (id === "tasks") updateTasks();
       if (id === "expenses") updateExpenseTable();
       if (id === "dashboard") updateDashboard();
       if (id === "reports") updateCharts();
+
+      // Hide sidebar on mobile after navigation
+      if (window.innerWidth < 768) {
+          toggleSidebar();
+      }
   }
 
   // --- INITIALIZE & LISTENERS ---
