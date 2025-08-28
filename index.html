@@ -221,34 +221,6 @@
         opacity: 0.5;
     }
   </style>
-
-  
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script>
-    // Your web app's Firebase configuration
-    // IMPORTANT: Replace these with your actual Firebase project configuration
-    const firebaseConfig = {
-      apiKey:    "YOUR_FIREBASE_API_KEY", // <--- REPLACE THIS WITH YOUR ACTUAL API KEY
-      authDomain:"inkspire-93fa1.firebaseapp.com",
-      projectId: "inkspire-93fa1",
-      storageBucket: "inkspire-93fa1.appspot.com",
-      messagingSenderId:"78600122689",
-      appId:     "1:78600122689:web:37da9c31db4fb36d4d71c0"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db   = firebase.firestore();
-
-    // Sign in anonymously so Firestore writes are allowed
-    // This is important for data operations later, but doesn't affect login authentication
-    auth.signInAnonymously()
-      .then(() => console.log("🔑 Signed in anonymously to Firebase"))
-      .catch(err => console.error("Firebase Auth error:", err));
-  </script>
 </head>
 
 <body class="bg-gray-50 text-gray-800">
@@ -278,6 +250,7 @@
           <div class="border-t border-gray-200 my-3"></div>
           <button onclick="showSection('expenses')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">💸 Expenses</button>
           <button onclick="showSection('earnings')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">💰 Earnings</button>
+          <button onclick="showSection('inventory')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📦 Inventory</button>
           <div class="border-t border-gray-200 my-3"></div>
           <button onclick="showSection('reports')" class="block text-left w-full py-2 px-3 rounded-lg text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200">📈 Reports</button>
         </nav>
@@ -349,7 +322,7 @@
           
           <fieldset class="md:col-span-2 border border-gray-300 p-5 rounded-lg">
             <legend class="font-semibold text-gray-700 mb-3">Job Details</legend>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
               <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Scanning" class="form-checkbox text-purple-600 rounded"> <span>Scanning</span></label>
               <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Laminating" class="form-checkbox text-purple-600 rounded"> <span>Laminating</span></label>
               <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Fax"       class="form-checkbox text-purple-600 rounded"> <span>Fax</span></label>
@@ -357,6 +330,10 @@
               <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Business Card" class="form-checkbox text-purple-600 rounded"> <span>Business Card</span></label>
               <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Colour Printing" class="form-checkbox text-purple-600 rounded"> <span>Colour Printing</span></label>
               <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="B&W Printing"    class="form-checkbox text-purple-600 rounded"> <span>B&W Printing</span></label>
+              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Logo" class="form-checkbox text-purple-600 rounded"> <span>Logo</span></label>
+              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Sticker" class="form-checkbox text-purple-600 rounded"> <span>Sticker</span></label>
+              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Mug" class="form-checkbox text-purple-600 rounded"> <span>Mug</span></label>
+              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Key Tag" class="form-checkbox text-purple-600 rounded"> <span>Key Tag</span></label>
               <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Other"            class="form-checkbox text-purple-600 rounded"> <span>Other</span></label>
             </div>
             <textarea id="other-details" placeholder="Other details." class="w-full mt-4 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"></textarea>
@@ -373,6 +350,15 @@
           <div>
             <label for="deadline" class="date-label">Deadline</label>
             <input id="deadline" type="date" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          </div>
+          
+          <div>
+            <label for="paid-status" class="date-label">Payment Status</label>
+            <select id="paid-status" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                <option value="unpaid" selected>Unpaid</option>
+                <option value="paid">Paid</option>
+                <option value="partial">Partial</option>
+            </select>
           </div>
 
           <fieldset class="md:col-span-2 border border-gray-300 p-5 rounded-lg">
@@ -413,6 +399,7 @@
                 <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Discount</th>
                 <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Deadline</th>
                 <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Status</th>
+                <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Paid Status</th>
                 <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Invoice</th>
                 <th class="border border-gray-200 p-3 text-left text-gray-600 font-semibold">Actions</th>
               </tr>
@@ -478,6 +465,11 @@
         </div>
       </section>
 
+      <section id="inventory" class="hidden section-transition bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold text-purple-700 mb-6">📦 Inventory Management</h2>
+        <p class="text-gray-600">Inventory features will be implemented here.</p>
+      </section>
+
       
 <section id="reports" class="hidden section-transition bg-white p-6 rounded-xl shadow-lg">
         <h2 class="text-2xl font-bold text-purple-700 mb-6">📈 Reports</h2>
@@ -522,707 +514,817 @@
       </section>
     </main>
     
-<div id="toast-container"></div>
-  </div>
+  <div id="toast-container"></div>
+</div>
 
-  
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    const USERS = { "Insaf":"INSAF03", "Inzi":"INZI01", "Iltizam":"ILTIZAM05" };
-    let jobData = [], expenseData = [], calendar;
-    let stats = { total:0, in_progress:0, completed:0, cancelled:0 };
-    let totalIncome=0, totalExpenses=0;
-    let lastChange = null; // To store the last change for undo functionality
+<script>
+  /*
+  * ==============================================================================
+  * IMPORTANT FIREBASE SETUP NOTE
+  * ==============================================================================
+  * For this application to ADD, EDIT, or DELETE data, you must configure your
+  * Firestore Security Rules. The default rules block all public access.
+  *
+  * TO GET STARTED (for development/testing ONLY):
+  * 1. Go to your Firebase project console.
+  * 2. Navigate to: Build > Firestore Database > Rules (tab).
+  * 3. Replace the entire content of the rules editor with the following:
+  *
+  * rules_version = '2';
+  * service cloud.firestore {
+  * match /databases/{database}/documents {
+  * match /{document=**} {
+  * allow read, write: if true;
+  * }
+  * }
+  * }
+  *
+  * 4. Click "Publish".
+  *
+  * WARNING: These rules allow anyone to read or write to your database.
+  * Do NOT use these rules in a production application.
+  * ==============================================================================
+  */
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBK4ZYB37Ke3E_bdkhY3XeScrelwSl8fYupw",
+    authDomain: "inkspire-93fa1.firebaseapp.com",
+    projectId: "inkspire-93fa1",
+    storageBucket: "inkspire-93fa1.firebasestorage.app",
+    messagingSenderId: "78600122689",
+    appId: "1:78600122689:web:37da9c31db4fb36d4d71c0"
+  };
+  
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
 
-    // Track which expense is being edited
-    let currentlyEditingExpenseId = null; 
+  // Sign in anonymously so Firestore writes are allowed
+  auth.signInAnonymously()
+    .then(() => console.log("🔑 Signed in anonymously to Firebase"))
+    .catch(err => console.error("Firebase Auth error:", err));
+  
+  const USERS = { "Insaf":"INSAF03", "Inzi":"INZI01", "Iltizam":"ILTIZAM05" };
+  let jobData = [], expenseData = [], calendar;
+  let stats = { total:0, in_progress:0, completed:0, cancelled:0 };
+  let totalIncome=0, totalExpenses=0;
+  let lastChange = null;
 
-    // NEW: Pagination State
-    let currentPage = 1;
-    let rowsPerPage = 10;
-      
-    // NEW: Chart instances
-    let incomeExpenseChart;
-    let jobStatusChart;
+  let currentlyEditingExpenseId = null; 
+  let currentPage = 1;
+  let rowsPerPage = 10;
+  let incomeExpenseChart;
+  let jobStatusChart;
 
-    // --- LOGIN / LOGOUT ---
-    function login() {
-      const u = document.getElementById("username").value.trim();
-      const p = document.getElementById("password").value.trim();
-      
-      if (USERS[u] === p) {
-        document.getElementById("login-screen").style.display = "none";
-        document.getElementById("app").style.display = "flex";
-        showSection("dashboard");
-      } else {
-        document.getElementById("login-error").classList.remove("hidden");
-      }
-    }
+  // --- LOGIN / LOGOUT ---
+  function login() {
+    const u = document.getElementById("username").value.trim();
+    const p = document.getElementById("password").value.trim();
     
-    function logout() {
-      document.getElementById("app").style.display = "none";
-      document.getElementById("login-screen").style.display = "flex";
-      document.getElementById("username").value = "";
-      document.getElementById("password").value = "";
-      document.getElementById("login-error").classList.add("hidden");
+    if (USERS[u] === p) {
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("app").style.display = "flex";
+      showSection("dashboard");
+    } else {
+      document.getElementById("login-error").classList.remove("hidden");
     }
+  }
+  
+  function logout() {
+    document.getElementById("app").style.display = "none";
+    document.getElementById("login-screen").style.display = "flex";
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("login-error").classList.add("hidden");
+  }
 
-    // --- UTILITY FUNCTIONS ---
-    function showToast(message, isError = false) {
-        const toastContainer = document.getElementById("toast-container");
-        const toast = document.createElement("div");
-        toast.className = `toast-message ${isError ? 'error' : ''}`;
-        toast.textContent = message;
-        toastContainer.appendChild(toast);
+  // --- UTILITY FUNCTIONS ---
+  function showToast(message, isError = false) {
+      const toastContainer = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      toast.className = `toast-message ${isError ? 'error' : ''}`;
+      toast.textContent = message;
+      toastContainer.appendChild(toast);
 
-        void toast.offsetWidth; 
+      void toast.offsetWidth; 
 
-        setTimeout(() => {
-            toast.classList.add("show");
-        }, 50);
+      setTimeout(() => {
+          toast.classList.add("show");
+      }, 50);
 
-        setTimeout(() => {
-            toast.classList.remove("show");
-            toast.addEventListener('transitionend', () => toast.remove());
-        }, 3000);
-    }
+      setTimeout(() => {
+          toast.classList.remove("show");
+          toast.addEventListener('transitionend', () => toast.remove());
+      }, 5000);
+  }
 
-    // --- SECTION NAVIGATION ---
-    function showSection(id, jobIdToHighlight = null) {
-        document.querySelectorAll("main > section").forEach(s => {
-            s.style.animation = 'none';
-            s.offsetHeight;
-            s.style.animation = null;
+  // --- SECTION NAVIGATION ---
+  function showSection(id, jobIdToHighlight = null) {
+      document.querySelectorAll("main > section").forEach(s => {
+          s.style.animation = 'none';
+          s.offsetHeight;
+          s.style.animation = null;
 
-            if (s.id === id) {
-                s.classList.remove("hidden");
-            } else {
-                s.classList.add("hidden");
-            }
-        });
-
-        document.querySelectorAll(".sidebar button").forEach(b => {
-            b.classList.remove("active", "bg-purple-200", "text-purple-800", "font-bold");
-            b.classList.add("text-gray-700");
-        });
-        const active = document.querySelector(`.sidebar button[onclick^="showSection('${id}')"]`);
-        if (active) active.classList.add("active", "bg-purple-200", "text-purple-800", "font-bold");
-        
-        if (id === "calendar" && calendar) calendar.render(); 
-        if (id === "tasks") {
-            updateTasks();
-            if (jobIdToHighlight) {
-                // Highlight logic remains the same
-            }
-        }
-        if (id === "expenses") updateExpenseTable();
-        if (id === "dashboard") updateDashboard();
-        if (id === "reports") updateCharts(); // NEW: Render charts when reports section is viewed
-    }
-
-
-    // --- INITIALIZE DATES & FIRESTORE LISTENERS ---
-    document.addEventListener('DOMContentLoaded', () => {
-      const today = new Date().toISOString().split("T")[0];
-      document.getElementById("order-date").value = today;
-      document.getElementById("expense-date").value = today;
-      initCalendar();
-
-      db.collection("jobs").orderBy("createdAt", "desc") // Order by newest first
-        .onSnapshot(snap => {
-          jobData = []; 
-          totalIncome = 0;
-          
-          if (calendar) {
-            calendar.getEvents().forEach(e => e.remove()); 
+          if (s.id === id) {
+              s.classList.remove("hidden");
+          } else {
+              s.classList.add("hidden");
           }
+      });
 
-          stats = { total: 0, in_progress: 0, completed: 0, cancelled: 0 };
-          
-          snap.forEach(doc => {
-            const j = { id: doc.id, ...doc.data() };
-            jobData.push(j);
-            
-            // Calendar event logic remains the same...
-            const todayDate = new Date();
-            todayDate.setHours(0,0,0,0); 
-            const deadlineDate = new Date(j.deadline);
-            deadlineDate.setHours(0,0,0,0); 
-
-            let eventClassName = '';
-            if (j.status === 'completed') eventClassName = 'fc-event-completed';
-            else if (j.status === 'cancelled') eventClassName = 'fc-event-cancelled';
-            else {
-                const diffTime = deadlineDate.getTime() - todayDate.getTime();
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                if (diffDays <= 2) eventClassName = 'fc-event-red';
-                else if (diffDays <= 5) eventClassName = 'fc-event-yellow';
-                else eventClassName = 'fc-event-green';
-            }
-            if (calendar) calendar.addEvent({ id: j.id, title: j.customer, start: j.deadline, allDay: true, classNames: [eventClassName] });
-            
-            if (j.incomeCounted !== false) {
-                totalIncome += (j.price - j.discount);
-            }
-          });
-
-          jobData.forEach(j => {
-              if (stats[j.status] !== undefined) stats[j.status]++;
-          });
-          stats.total = jobData.length;
-
-          updateDashboard();
+      document.querySelectorAll(".sidebar button").forEach(b => {
+          b.classList.remove("active", "bg-purple-200", "text-purple-800", "font-bold");
+          b.classList.add("text-gray-700");
+      });
+      const active = document.querySelector(`.sidebar button[onclick^="showSection('${id}')"]`);
+      if (active) active.classList.add("active", "bg-purple-200", "text-purple-800", "font-bold");
+      
+      if (id === "calendar" && calendar) calendar.render(); 
+      if (id === "tasks") {
           updateTasks();
-          updateReports();
-          updateCharts(); // NEW: Update charts with new data
-          updateRecentActivity(); // NEW: Update dashboard component
-          updateUpcomingDeadlines(); // NEW: Update dashboard component
-          if (calendar) calendar.render();
-        }, err => console.error("Jobs listener error:", err));
-
-      db.collection("expenses").orderBy("createdAt")
-        .onSnapshot(snap => {
-          expenseData = [];
-          snap.forEach(doc => expenseData.push({ id: doc.id, ...doc.data() }));
-          totalExpenses = expenseData.reduce((sum, e) => sum + e.amount, 0);
-          updateDashboard();
-          updateExpenseTable();
-          updateReports();
-          updateCharts(); // NEW: Update charts with new data
-        }, err => console.error("Expenses listener error:", err));
-    });
-
-    // --- CALENDAR SETUP ---
-    function initCalendar(){
-      const el=document.getElementById("calendarEl");
-      if (!calendar) {
-        calendar=new FullCalendar.Calendar(el,{
-          initialView:'dayGridMonth',
-          height:600,
-          eventDidMount: info => { info.el.style.borderColor='transparent'; },
-          eventClick: function(info) {
-              const jobId = info.event.id;
-              if (jobId) {
-                  showSection('tasks', jobId);
-                  showToast(`Navigating to task for ${info.event.title}`);
-              }
-          }
-        });
       }
-    }
+      if (id === "expenses") updateExpenseTable();
+      if (id === "dashboard") updateDashboard();
+      if (id === "reports") updateCharts();
+  }
 
-    // --- JOB FORM SUBMISSION ---
-    document.getElementById("job-form").addEventListener("submit",function(e){
-      e.preventDefault();
-      const customer = document.getElementById("customer").value.trim();
-      const phone = document.getElementById("customer-phone").value.trim();
-      const price = parseFloat(document.getElementById("price").value)||0;
-      const discount = parseFloat(document.getElementById("discount").value)||0;
-      const orderDate= document.getElementById("order-date").value;
-      const deadline = document.getElementById("deadline").value;
-      const details = [...document.querySelectorAll('input[name="details"]:checked')].map(cb=>cb.value);
-      const other = document.getElementById("other-details").value.trim();
-      const fullDetails=[...details, other?`Other: ${other}`:''].filter(Boolean).join(", ");
-      const delivery = document.querySelector('input[name="delivery"]:checked')?.value;
-      let contact="";
-      if(delivery==="address") contact=document.querySelector("#delivery-address input").value.trim();
-      if(delivery==="email")   contact=document.querySelector("#delivery-email input").value.trim();
-      if(delivery==="whatsapp")contact=document.querySelector("#delivery-whatsapp input").value.trim();
-
-      const job={ customer, phone, contact, details:fullDetails, price, discount, orderDate, deadline, status:"in_progress", incomeCounted:true, createdAt: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }; // Add updatedAt
-      
-      db.collection("jobs").add(job)
-        .then((docRef)=> {
-            showToast("Job added successfully!");
-            this.reset();
-            lastChange = { type: 'add', jobId: docRef.id, data: job }; 
-        })
-        .catch(err=> {
-            console.error("Error adding job:",err);
-            showToast("Error adding job.", true);
-        });
-    });
-
-    // --- EXPENSE FORM SUBMISSION ---
-    document.getElementById("expense-form").addEventListener("submit",function(e){
-        e.preventDefault();
-        const title = document.getElementById("expense-title").value.trim();
-        const amount = parseFloat(document.getElementById("expense-amount").value) || 0;
-        const date = document.getElementById("expense-date").value;
-
-        const expense = { title, amount, date, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-        db.collection("expenses").add(expense)
-            .then(docRef => {
-                showToast("Expense added successfully!");
-                this.reset();
-                lastChange = { type: 'addExpense', expenseId: docRef.id, data: expense };
-            })
-            .catch(err => {
-                console.error("Error adding expense:", err);
-                showToast("Error adding expense.", true);
-            });
-    });
-
-    // --- UI UPDATES (TASKS, EXPENSES, ETC.) ---
-    function updateExpenseTable(){
-      const tbody=document.getElementById("expense-body");
-      tbody.innerHTML="";
-      expenseData.forEach(e=>{
-        const row=document.createElement("tr");
-        row.dataset.expenseId = e.id;
-        // The rest of the expense table logic remains the same...
-        if (currentlyEditingExpenseId === e.id) {
-            row.innerHTML = `...`; // Editable row HTML
-        } else {
-            row.innerHTML=`<td class="border border-gray-200 p-3">${e.title}</td><td class="border border-gray-200 p-3">Rs. ${e.amount.toFixed(2)}</td><td class="border border-gray-200 p-3">${e.date}</td><td class="border p-3 whitespace-nowrap"><button onclick="editExpense('${e.id}')" class="text-yellow-600 hover:text-yellow-800 font-semibold mr-2">Edit</button><button onclick="deleteExpense('${e.id}')" class="text-red-600 hover:text-red-800 font-semibold">Delete</button></td>`;
-        }
-        tbody.appendChild(row);
-      });
-    }
-
-    let currentlyEditingJobId = null;
-
-    // MODIFIED: updateTasks with Pagination
-    function updateTasks(){
-      const tbody=document.getElementById("tasks-body");
-      tbody.innerHTML="";
-      
-      const start = (currentPage - 1) * rowsPerPage;
-      const end = start + rowsPerPage;
-      const paginatedJobs = jobData.slice(start, end);
-
-      const todayDate = new Date();
-      todayDate.setHours(0,0,0,0);
-
-      paginatedJobs.forEach((job)=>{
-        const row=document.createElement("tr");
-        row.dataset.jobId = job.id;
-        // Row background and deadline class logic remains the same...
-        let rowBgClass = '';
-        if (job.status === "completed") rowBgClass = "bg-green-100"; 
-        else if (job.status === "cancelled") rowBgClass = "bg-red-100";
-        row.className = rowBgClass;
-
-        let deadlineClass = '';
-        if (job.status === "in_progress" && job.deadline) {
-            const deadlineDate = new Date(job.deadline);
-            deadlineDate.setHours(0,0,0,0);
-            const diffDays = Math.ceil((deadlineDate - todayDate) / (1000 * 60 * 60 * 24));
-            if (diffDays <= 2) deadlineClass = 'bg-red-200 text-red-800 font-semibold';
-            else if (diffDays <= 5) deadlineClass = 'bg-yellow-200 text-yellow-800 font-semibold';
-        }
-        
-        let statusTextColor = "text-gray-800";
-        if (job.status === "completed") statusTextColor = "text-green-800";
-        else if (job.status === "cancelled") statusTextColor = "text-red-800";
-
-        // Editable row logic remains the same...
-        if (currentlyEditingJobId === job.id) {
-            // ...
-        } else {
-            row.innerHTML=`
-              <td class="border p-3">${job.customer || ''}</td>
-              <td class="border p-3">${job.phone || ''}</td>
-              <td class="border p-3">${job.contact || ''}</td>
-              <td class="border p-3">${job.details || ''}</td>
-              <td class="border p-3">Rs. ${(job.price || 0).toFixed(2)}</td>
-              <td class="border p-3">Rs. ${(job.discount || 0).toFixed(2)}</td>
-              <td class="border p-3 ${deadlineClass}">${job.deadline || ''}</td>
-              <td class="border p-3">
-                <select onchange="updateStatus(this,'${job.id}')" class="p-2 border rounded-lg ${statusTextColor}">
-                  <option value="in_progress"${job.status==="in_progress"?" selected":""}>In Progress</option>
-                  <option value="completed"${job.status==="completed"?" selected":""}>Completed</option>
-                  <option value="cancelled"${job.status==="cancelled"?" selected":""}>Cancelled</option>
-                </select>
-              </td>
-              <td class="border p-3"><button onclick="printInvoice('${job.id}')" class="text-blue-600 hover:text-blue-800 font-semibold">Print</button></td>
-              <td class="border p-3 whitespace-nowrap">
-                <button onclick="editJob('${job.id}')" class="text-yellow-600 hover:text-yellow-800 font-semibold mr-2">Edit</button>
-                <button onclick="deleteJob('${job.id}')" class="text-red-600 hover:text-red-800 font-semibold">Delete</button>
-              </td>
-            `;
-        }
-        tbody.appendChild(row);
-      });
-      setupPagination();
-      filterTasks(); // Re-apply search filter after re-rendering
-    }
-      
-    // NEW: Search and Filtering function
-    function filterTasks() {
-        const searchTerm = document.getElementById('task-search').value.toLowerCase();
-        const rows = document.querySelectorAll('#tasks-body tr');
-        rows.forEach(row => {
-            const customer = row.cells[0].textContent.toLowerCase();
-            const phone = row.cells[1].textContent.toLowerCase();
-            const details = row.cells[3].textContent.toLowerCase();
-            if (customer.includes(searchTerm) || phone.includes(searchTerm) || details.includes(searchTerm)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    }
-
-    // NEW: Pagination functions
-    function setupPagination() {
-        const wrapper = document.getElementById('pagination-controls');
-        wrapper.innerHTML = '';
-        const pageCount = Math.ceil(jobData.length / rowsPerPage);
-
-        if (pageCount <= 1) return; // No need for controls if there's only one page
-
-        // Previous Button
-        const prevButton = document.createElement('button');
-        prevButton.innerText = '« Prev';
-        prevButton.disabled = currentPage === 1;
-        prevButton.onclick = () => {
-            changePage(currentPage - 1);
-        };
-        wrapper.appendChild(prevButton);
-
-        // Page Number Buttons
-        for (let i = 1; i <= pageCount; i++) {
-            const btn = document.createElement('button');
-            btn.innerText = i;
-            if (currentPage === i) {
-                btn.classList.add('active');
-            }
-            btn.onclick = () => changePage(i);
-            wrapper.appendChild(btn);
-        }
-
-        // Next Button
-        const nextButton = document.createElement('button');
-        nextButton.innerText = 'Next »';
-        nextButton.disabled = currentPage === pageCount;
-        nextButton.onclick = () => {
-            changePage(currentPage + 1);
-        };
-        wrapper.appendChild(nextButton);
-    }
-
-    function changePage(page) {
-        if (page < 1 || page > Math.ceil(jobData.length / rowsPerPage)) return;
-        currentPage = page;
-        updateTasks();
-    }
-
-    function updateStatus(sel, jobId){
-        const newSt = sel.value;
-        const job = jobData.find(j => j.id === jobId);
-        if (!job) return;
-
-        const prevStatus = job.status;
-        const prevIncomeCounted = job.incomeCounted === undefined ? true : job.incomeCounted;
-        lastChange = { type: 'updateStatus', jobId, prevStatus, newStatus: newSt, prevIncomeCounted };
-
-        let newIncomeCounted = prevIncomeCounted;
-        if(prevStatus !== "cancelled" && newSt === "cancelled") newIncomeCounted = false;
-        if(prevStatus === "cancelled" && newSt !== "cancelled") newIncomeCounted = true;
-
-        // Add updatedAt timestamp
-        db.collection("jobs").doc(jobId).update({ status: newSt, incomeCounted: newIncomeCounted, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
-            .then(() => {
-                showToast("Job status updated successfully!");
-                // Snapshot listener will handle UI updates
-            })
-            .catch(err => {
-                showToast("Error updating status.", true);
-            });
-    }
-
-    function updateCalendarEventColor(jobId, newStatus) {
-        // This function's logic remains the same
-    }
-
-    function deleteJob(jobId) {
-        // This function's logic remains the same
-    }
-
-    function editJob(jobId) {
-        currentlyEditingJobId = jobId;
-        updateTasks();
-    }
+  // --- INITIALIZE & LISTENERS ---
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set initial dates
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("order-date").value = today;
+    document.getElementById("expense-date").value = today;
     
-    // All other CRUD and utility functions (cancelEdit, saveEditedJob, editExpense, etc.) remain the same.
+    // Initialize calendar
+    initCalendar();
 
-    // --- REPORTING & CHARTS ---
-    function updateReports(){
-      const tb=document.getElementById("report-body");
-      tb.innerHTML="";
-      jobData.forEach(j=>{
-        if(j.incomeCounted !== false){
-          tb.innerHTML+=`<tr class="hover:bg-gray-50"><td class="border p-3 text-green-700">Income</td><td class="border p-3">${j.customer || ''}</td><td class="border p-3 font-semibold">Rs. ${(j.price-j.discount).toFixed(2)}</td><td class="border p-3">${j.orderDate || ''}</td></tr>`;
-        }
-      });
-      expenseData.forEach(e=>{
-        tb.innerHTML+=`<tr class="hover:bg-gray-50"><td class="border p-3 text-red-700">Expense</td><td class="border p-3">${e.title || ''}</td><td class="border p-3 font-semibold">Rs. ${e.amount.toFixed(2)}</td><td class="border p-3">${e.date || ''}</td></tr>`;
-      });
-    }
-      
-    // NEW: Function to update charts
-    function updateCharts() {
-        if (!document.getElementById('reports').classList.contains('hidden')) {
-            // --- Income vs. Expense Chart ---
-            const incomeCtx = document.getElementById('incomeExpenseChart').getContext('2d');
-            const monthlyData = {}; // Format: { 'YYYY-MM': { income: 0, expense: 0 } }
-
-            jobData.forEach(j => {
-                if (j.incomeCounted !== false && j.orderDate) {
-                    const month = j.orderDate.substring(0, 7); // 'YYYY-MM'
-                    if (!monthlyData[month]) monthlyData[month] = { income: 0, expense: 0 };
-                    monthlyData[month].income += (j.price - j.discount);
-                }
-            });
-
-            expenseData.forEach(e => {
-                if (e.date) {
-                    const month = e.date.substring(0, 7);
-                    if (!monthlyData[month]) monthlyData[month] = { income: 0, expense: 0 };
-                    monthlyData[month].expense += e.amount;
-                }
-            });
-            
-            const sortedMonths = Object.keys(monthlyData).sort();
-            const labels = sortedMonths.map(month => new Date(month + '-02').toLocaleString('default', { month: 'short', year: 'numeric' }));
-            const incomeValues = sortedMonths.map(month => monthlyData[month].income);
-            const expenseValues = sortedMonths.map(month => monthlyData[month].expense);
-
-            if (incomeExpenseChart) incomeExpenseChart.destroy();
-            incomeExpenseChart = new Chart(incomeCtx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Income', data: incomeValues, borderColor: 'rgba(34, 197, 94, 1)', backgroundColor: 'rgba(34, 197, 94, 0.2)', fill: true, tension: 0.1 },
-                        { label: 'Expenses', data: expenseValues, borderColor: 'rgba(239, 68, 68, 1)', backgroundColor: 'rgba(239, 68, 68, 0.2)', fill: true, tension: 0.1 }
-                    ]
-                }
-            });
-
-            // --- Job Status Chart ---
-            const statusCtx = document.getElementById('jobStatusChart').getContext('2d');
-            if (jobStatusChart) jobStatusChart.destroy();
-            jobStatusChart = new Chart(statusCtx, {
-                type: 'pie',
-                data: {
-                    labels: ['In Progress', 'Completed', 'Cancelled'],
-                    datasets: [{
-                        label: 'Job Status',
-                        data: [stats.in_progress, stats.completed, stats.cancelled],
-                        backgroundColor: ['rgba(245, 158, 11, 1)', 'rgba(22, 163, 74, 1)', 'rgba(220, 38, 38, 1)'],
-                        hoverOffset: 4
-                    }]
-                },
-                // *** FIX: REMOVED "maintainAspectRatio: false" to prevent floating/stretching ***
-                options: { 
-                    responsive: true
-                }
-            });
-        }
-    }
-
-
-    // --- DASHBOARD UPDATES ---
-    function updateDashboard(){
-      document.getElementById("stat-total").textContent   = stats.total;
-      document.getElementById("stat-progress").textContent= stats.in_progress;
-      document.getElementById("stat-completed").textContent= stats.completed;
-      document.getElementById("stat-cancelled").textContent= stats.cancelled;
-      document.getElementById("income-total").textContent = `Rs. ${totalIncome.toFixed(2)}`;
-      document.getElementById("expense-total").textContent= `Rs. ${totalExpenses.toFixed(2)}`;
-      document.getElementById("profit-total").textContent = `Rs. ${(totalIncome-totalExpenses).toFixed(2)}`;
-
-      const today = new Date().toISOString().split("T")[0];
-      const dueTodayCount = jobData.filter(job => job.status === 'in_progress' && job.deadline === today).length;
-      const alertDiv = document.getElementById("due-today-alert");
-      const alertMessage = document.getElementById("due-today-message");
-      const alertCircle = document.getElementById("due-today-count-circle");
-
-      if (dueTodayCount > 0) {
-          alertMessage.textContent = `You have ${dueTodayCount} order(s) with a deadline of today.`;
-          alertCircle.textContent = dueTodayCount;
-          alertDiv.classList.remove("hidden");
-          alertCircle.classList.remove("hidden");
-      } else {
-          alertDiv.classList.add("hidden");
-          alertCircle.classList.add("hidden");
-      }
-    }
-      
-    // NEW: Update Dashboard Recent Activity
-    function updateRecentActivity() {
-        const list = document.getElementById('recent-activity-list');
-        list.innerHTML = '';
-        const sortedJobs = [...jobData].sort((a, b) => (b.updatedAt?.toMillis() || 0) - (a.updatedAt?.toMillis() || 0));
-        const recentJobs = sortedJobs.slice(0, 5);
-        
-        if (recentJobs.length === 0) {
-            list.innerHTML = '<li class="text-gray-500">No recent activity.</li>';
-            return;
-        }
-
-        recentJobs.forEach(job => {
-            const li = document.createElement('li');
-            li.className = 'flex justify-between items-center bg-gray-50 p-2 rounded-md';
-            const statusClass = job.status === 'completed' ? 'text-green-600' : job.status === 'cancelled' ? 'text-red-600' : 'text-yellow-600';
-            li.innerHTML = `
-                <div>
-                    <p class="font-semibold">${job.customer}</p>
-                    <p class="text-xs text-gray-500">${job.details.substring(0, 30)}...</p>
-                </div>
-                <span class="font-bold text-xs capitalize ${statusClass}">${job.status.replace('_', ' ')}</span>
-            `;
-            list.appendChild(li);
-        });
-    }
-
-    // NEW: Update Dashboard Upcoming Deadlines
-    function updateUpcomingDeadlines() {
-        const list = document.getElementById('upcoming-deadlines-list');
-        list.innerHTML = '';
-        const upcoming = jobData
-            .filter(j => j.status === 'in_progress' && new Date(j.deadline) >= new Date())
-            .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
-            .slice(0, 5);
-
-        if (upcoming.length === 0) {
-            list.innerHTML = '<li class="text-gray-500">No upcoming deadlines.</li>';
-            return;
-        }
-
-        upcoming.forEach(job => {
-            const li = document.createElement('li');
-            li.className = 'flex justify-between items-center bg-gray-50 p-2 rounded-md';
-            li.innerHTML = `
-                <div>
-                    <p class="font-semibold">${job.customer}</p>
-                    <p class="text-xs text-gray-500">${job.phone}</p>
-                </div>
-                <span class="font-bold text-xs text-red-700">${job.deadline}</span>
-            `;
-            list.appendChild(li);
-        });
-    }
-      
-    // NEW: Invoice Printing Function
-    function printInvoice(jobId) {
-        const job = jobData.find(j => j.id === jobId);
-        if (!job) {
-            showToast('Could not find job details to print.', true);
-            return;
-        }
-
-        const total = (job.price || 0) - (job.discount || 0);
-
-        const invoiceHTML = `
-            <html>
-            <head>
-                <title>Invoice - ${job.customer}</title>
-                <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-                <style>
-                    body { font-family: 'Inter', sans-serif; }
-                    @media print {
-                        body { -webkit-print-color-adjust: exact; }
-                        .no-print { display: none; }
-                    }
-                </style>
-            </head>
-            <body class="bg-white">
-                <div class="p-8 max-w-2xl mx-auto">
-                    <div class="flex justify-between items-center pb-4 border-b">
-                        <div>
-                            <img src="LOGO.png" alt="INKSPIRE Logo" class="h-16">
-                            <p class="text-gray-600 text-sm">Your Company Address<br>City, Postal Code<br>Phone: (123) 456-7890</p>
-                        </div>
-                        <h1 class="text-4xl font-bold text-purple-700">INVOICE</h1>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mt-8">
-                        <div>
-                            <h2 class="font-semibold text-gray-700">BILL TO:</h2>
-                            <p>${job.customer}</p>
-                            <p>${job.phone}</p>
-                            <p>${job.contact || ''}</p>
-                        </div>
-                        <div class="text-right">
-                            <p><span class="font-semibold">Invoice #:</span> ${job.id.substring(0, 8).toUpperCase()}</p>
-                            <p><span class="font-semibold">Order Date:</span> ${job.orderDate}</p>
-                            <p><span class="font-semibold">Deadline:</span> ${job.deadline}</p>
-                        </div>
-                    </div>
-                    <div class="mt-8">
-                        <table class="w-full">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th class="p-3 text-left font-semibold">Description</th>
-                                    <th class="p-3 text-right font-semibold">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="border-b">
-                                    <td class="p-3">${job.details}</td>
-                                    <td class="p-3 text-right">Rs. ${job.price.toFixed(2)}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="flex justify-end mt-4">
-                        <div class="w-full max-w-xs">
-                            <div class="flex justify-between">
-                                <span class="font-semibold">Subtotal:</span>
-                                <span>Rs. ${job.price.toFixed(2)}</span>
-                            </div>
-                            <div class="flex justify-between text-red-600">
-                                <span class="font-semibold">Discount:</span>
-                                <span>- Rs. ${job.discount.toFixed(2)}</span>
-                            </div>
-                            <div class="flex justify-between mt-2 pt-2 border-t-2 border-purple-700">
-                                <span class="font-bold text-lg">TOTAL:</span>
-                                <span class="font-bold text-lg">Rs. ${total.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-16 text-center text-gray-500 text-sm">
-                        <p>Thank you for your business!</p>
-                        <button onclick="window.print()" class="no-print mt-4 bg-purple-600 text-white py-2 px-6 rounded-lg">Print</button>
-                    </div>
-                </div>
-            </body>
-            </html>
-        `;
-
-        const printWindow = window.open('', '', 'height=800,width=800');
-        printWindow.document.write(invoiceHTML);
-        printWindow.document.close();
-        printWindow.focus();
-    }
-
-
-    // --- MISC FUNCTIONS (UNCHANGED) ---
-    function updateTotalDisplay() {
-        const price = parseFloat(document.getElementById("price").value) || 0;
-        const discount = parseFloat(document.getElementById("discount").value) || 0;
-        document.getElementById("total-display").textContent = `Rs. ${(price - discount).toFixed(2)}`;
-    }
-    document.addEventListener('DOMContentLoaded', updateTotalDisplay);
+    // Attach form listeners
+    document.getElementById("job-form").addEventListener("submit", handleJobFormSubmit);
+    document.getElementById("expense-form").addEventListener("submit", handleExpenseFormSubmit);
     document.getElementById("price").addEventListener("input", updateTotalDisplay);
     document.getElementById("discount").addEventListener("input", updateTotalDisplay);
-    function toggleDeliveryFields(type) {
-        document.getElementById("delivery-address").classList.add("hidden");
-        document.getElementById("delivery-email").classList.add("hidden");
-        document.getElementById("delivery-whatsapp").classList.add("hidden");
-        document.querySelector("#delivery-address input").value = "";
-        document.querySelector("#delivery-email input").value = "";
-        document.querySelector("#delivery-whatsapp input").value = "";
-        if (type === "address") document.getElementById("delivery-address").classList.remove("hidden");
-        else if (type === "email") document.getElementById("delivery-email").classList.remove("hidden");
-        else if (type === "whatsapp") document.getElementById("delivery-whatsapp").classList.remove("hidden");
-    }
-    // UndoLastChange, sorting, filtering reports... these functions remain the same.
-    // ... [ The rest of your existing JS code like undoLastChange, saveEditedJob, deleteExpense, etc., goes here ]
 
-  </script>
+    // Firestore listeners
+    db.collection("jobs").orderBy("createdAt", "desc")
+      .onSnapshot(snap => {
+        jobData = []; 
+        totalIncome = 0;
+        
+        if (calendar) {
+          calendar.getEvents().forEach(e => e.remove()); 
+        }
+
+        stats = { total: 0, in_progress: 0, completed: 0, cancelled: 0 };
+        
+        snap.forEach(doc => {
+          const j = { id: doc.id, ...doc.data() };
+          jobData.push(j);
+          
+          const todayDate = new Date();
+          todayDate.setHours(0,0,0,0); 
+          const deadlineDate = new Date(j.deadline);
+          deadlineDate.setHours(0,0,0,0); 
+
+          let eventClassName = '';
+          if (j.status === 'completed') eventClassName = 'fc-event-completed';
+          else if (j.status === 'cancelled') eventClassName = 'fc-event-cancelled';
+          else {
+              const diffTime = deadlineDate.getTime() - todayDate.getTime();
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+              if (diffDays <= 2) eventClassName = 'fc-event-red';
+              else if (diffDays <= 5) eventClassName = 'fc-event-yellow';
+              else eventClassName = 'fc-event-green';
+          }
+          if (calendar) calendar.addEvent({ id: j.id, title: j.customer, start: j.deadline, allDay: true, classNames: [eventClassName] });
+          
+          if (j.incomeCounted !== false) {
+              totalIncome += (j.price - j.discount);
+          }
+        });
+
+        jobData.forEach(j => {
+            if (stats[j.status] !== undefined) stats[j.status]++;
+        });
+        stats.total = jobData.length;
+
+        updateDashboard();
+        updateTasks();
+        updateReports();
+        updateCharts();
+        updateRecentActivity();
+        updateUpcomingDeadlines();
+        if (calendar) calendar.render();
+      }, err => console.error("Jobs listener error:", err));
+
+    db.collection("expenses").orderBy("createdAt")
+      .onSnapshot(snap => {
+        expenseData = [];
+        snap.forEach(doc => expenseData.push({ id: doc.id, ...doc.data() }));
+        totalExpenses = expenseData.reduce((sum, e) => sum + e.amount, 0);
+        updateDashboard();
+        updateExpenseTable();
+        updateReports();
+        updateCharts();
+      }, err => console.error("Expenses listener error:", err));
+  });
+
+  // --- CALENDAR SETUP ---
+  function initCalendar(){
+    const el=document.getElementById("calendarEl");
+    if (!calendar && el) {
+      calendar=new FullCalendar.Calendar(el,{
+        initialView:'dayGridMonth',
+        height:600,
+        eventDidMount: info => { info.el.style.borderColor='transparent'; },
+        eventClick: function(info) {
+            const jobId = info.event.id;
+            if (jobId) {
+                showSection('tasks');
+                showToast(`Navigating to task for ${info.event.title}`);
+            }
+        }
+      });
+    }
+  }
+
+  // --- FORM SUBMISSION HANDLERS ---
+  function handleJobFormSubmit(e){
+    e.preventDefault();
+    const form = e.target;
+    const customer = document.getElementById("customer").value.trim();
+    const phone = document.getElementById("customer-phone").value.trim();
+    const price = parseFloat(document.getElementById("price").value)||0;
+    const discount = parseFloat(document.getElementById("discount").value)||0;
+    
+    if (!isFinite(price) || !isFinite(discount)) {
+      showToast("Error: Price and Discount must be valid numbers.", true);
+      return;
+    }
+
+    const orderDate= document.getElementById("order-date").value;
+    const deadline = document.getElementById("deadline").value;
+    const paidStatus = document.getElementById("paid-status").value;
+    const details = [...document.querySelectorAll('input[name="details"]:checked')].map(cb=>cb.value);
+    const other = document.getElementById("other-details").value.trim();
+    const fullDetails=[...details, other?`Other: ${other}`:''].filter(Boolean).join(", ");
+    const delivery = document.querySelector('input[name="delivery"]:checked')?.value;
+    let contact="";
+    if(delivery==="address") contact=document.querySelector("#delivery-address input").value.trim();
+    if(delivery==="email")   contact=document.querySelector("#delivery-email input").value.trim();
+    if(delivery==="whatsapp")contact=document.querySelector("#delivery-whatsapp input").value.trim();
+
+    const job={ customer, phone, contact, details:fullDetails, price, discount, orderDate, deadline, paidStatus, status:"in_progress", incomeCounted:true, createdAt: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+    
+    db.collection("jobs").add(job)
+      .then((docRef)=> {
+          showToast("Job added successfully!");
+          form.reset();
+          document.getElementById("paid-status").value = "unpaid"; 
+          const today = new Date().toISOString().split("T")[0];
+          document.getElementById("order-date").value = today;
+          updateTotalDisplay();
+          lastChange = { type: 'add', jobId: docRef.id, data: job }; 
+      })
+      .catch(err=> {
+          console.error("Error adding job:",err);
+          const errorMessage = err.message ? `Error adding job: ${err.message}` : "An unknown error occurred while adding the job.";
+          showToast(errorMessage, true);
+      });
+  }
+
+  function handleExpenseFormSubmit(e){
+      e.preventDefault();
+      const form = e.target;
+      const title = document.getElementById("expense-title").value.trim();
+      const amount = parseFloat(document.getElementById("expense-amount").value) || 0;
+      const date = document.getElementById("expense-date").value;
+
+      const expense = { title, amount, date, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+      db.collection("expenses").add(expense)
+          .then(docRef => {
+              showToast("Expense added successfully!");
+              form.reset();
+              document.getElementById("expense-date").value = new Date().toISOString().split("T")[0];
+              lastChange = { type: 'addExpense', expenseId: docRef.id, data: expense };
+          })
+          .catch(err => {
+              console.error("Error adding expense:", err);
+              showToast("Error adding expense.", true);
+          });
+  }
+
+  // --- UI UPDATES ---
+  function updateExpenseTable(){
+    const tbody=document.getElementById("expense-body");
+    tbody.innerHTML="";
+    expenseData.forEach(e=>{
+      const row=document.createElement("tr");
+      row.dataset.expenseId = e.id;
+      row.innerHTML=`<td class="border border-gray-200 p-3">${e.title}</td><td class="border border-gray-200 p-3">Rs. ${e.amount.toFixed(2)}</td><td class="border border-gray-200 p-3">${e.date}</td><td class="border p-3 whitespace-nowrap"><button onclick="editExpense('${e.id}')" class="text-yellow-600 hover:text-yellow-800 font-semibold mr-2">Edit</button><button onclick="deleteExpense('${e.id}')" class="text-red-600 hover:text-red-800 font-semibold">Delete</button></td>`;
+      tbody.appendChild(row);
+    });
+  }
+
+  function updateTasks(){
+    const tbody=document.getElementById("tasks-body");
+    tbody.innerHTML="";
+    
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const paginatedJobs = jobData.slice(start, end);
+
+    const todayDate = new Date();
+    todayDate.setHours(0,0,0,0);
+
+    paginatedJobs.forEach((job)=>{
+      const row=document.createElement("tr");
+      row.dataset.jobId = job.id;
+      let rowBgClass = '';
+      if (job.status === "completed") rowBgClass = "bg-green-100"; 
+      else if (job.status === "cancelled") rowBgClass = "bg-red-100";
+      row.className = rowBgClass;
+
+      let deadlineClass = '';
+      if (job.status === "in_progress" && job.deadline) {
+          const deadlineDate = new Date(job.deadline);
+          deadlineDate.setHours(0,0,0,0);
+          const diffDays = Math.ceil((deadlineDate - todayDate) / (1000 * 60 * 60 * 24));
+          if (diffDays <= 2) deadlineClass = 'bg-red-200 text-red-800 font-semibold';
+          else if (diffDays <= 5) deadlineClass = 'bg-yellow-200 text-yellow-800 font-semibold';
+      }
+      
+      let statusTextColor = "text-gray-800";
+      if (job.status === "completed") statusTextColor = "text-green-800";
+      else if (job.status === "cancelled") statusTextColor = "text-red-800";
+
+      let paidStatusTextColor = "text-gray-800";
+      const jobPaidStatus = job.paidStatus || 'unpaid';
+      if (jobPaidStatus === "paid") paidStatusTextColor = "text-green-800 font-semibold";
+      else if (jobPaidStatus === "unpaid") paidStatusTextColor = "text-red-800 font-semibold";
+      else if (jobPaidStatus === "partial") paidStatusTextColor = "text-yellow-800 font-semibold";
+
+      row.innerHTML=`
+        <td class="border p-3">${job.customer || ''}</td>
+        <td class="border p-3">${job.phone || ''}</td>
+        <td class="border p-3">${job.contact || ''}</td>
+        <td class="border p-3">${job.details || ''}</td>
+        <td class="border p-3">Rs. ${(job.price || 0).toFixed(2)}</td>
+        <td class="border p-3">Rs. ${(job.discount || 0).toFixed(2)}</td>
+        <td class="border p-3 ${deadlineClass}">${job.deadline || ''}</td>
+        <td class="border p-3">
+          <select onchange="updateStatus(this,'${job.id}')" class="p-2 border rounded-lg ${statusTextColor}">
+            <option value="in_progress"${job.status==="in_progress"?" selected":""}>In Progress</option>
+            <option value="completed"${job.status==="completed"?" selected":""}>Completed</option>
+            <option value="cancelled"${job.status==="cancelled"?" selected":""}>Cancelled</option>
+          </select>
+        </td>
+        <td class="border p-3">
+          <select onchange="updatePaidStatus(this,'${job.id}')" class="p-2 border rounded-lg ${paidStatusTextColor}">
+            <option value="unpaid"${jobPaidStatus === "unpaid" ? " selected" : ""}>Unpaid</option>
+            <option value="paid"${jobPaidStatus === "paid" ? " selected" : ""}>Paid</option>
+            <option value="partial"${jobPaidStatus === "partial" ? " selected" : ""}>Partial</option>
+          </select>
+        </td>
+        <td class="border p-3"><button onclick="printInvoice('${job.id}')" class="text-blue-600 hover:text-blue-800 font-semibold">Print</button></td>
+        <td class="border p-3 whitespace-nowrap">
+          <button onclick="editJob('${job.id}')" class="text-yellow-600 hover:text-yellow-800 font-semibold mr-2">Edit</button>
+          <button onclick="deleteJob('${job.id}')" class="text-red-600 hover:text-red-800 font-semibold">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+    setupPagination();
+    filterTasks();
+  }
+    
+  function filterTasks() {
+      const searchTerm = document.getElementById('task-search').value.toLowerCase();
+      const rows = document.querySelectorAll('#tasks-body tr');
+      rows.forEach(row => {
+          const customer = row.cells[0].textContent.toLowerCase();
+          const phone = row.cells[1].textContent.toLowerCase();
+          const details = row.cells[3].textContent.toLowerCase();
+          if (customer.includes(searchTerm) || phone.includes(searchTerm) || details.includes(searchTerm)) {
+              row.style.display = '';
+          } else {
+              row.style.display = 'none';
+          }
+      });
+  }
+
+  function setupPagination() {
+      const wrapper = document.getElementById('pagination-controls');
+      wrapper.innerHTML = '';
+      const pageCount = Math.ceil(jobData.length / rowsPerPage);
+
+      if (pageCount <= 1) return;
+
+      const prevButton = document.createElement('button');
+      prevButton.innerText = '« Prev';
+      prevButton.disabled = currentPage === 1;
+      prevButton.onclick = () => { changePage(currentPage - 1); };
+      wrapper.appendChild(prevButton);
+
+      for (let i = 1; i <= pageCount; i++) {
+          const btn = document.createElement('button');
+          btn.innerText = i;
+          if (currentPage === i) btn.classList.add('active');
+          btn.onclick = () => changePage(i);
+          wrapper.appendChild(btn);
+      }
+
+      const nextButton = document.createElement('button');
+      nextButton.innerText = 'Next »';
+      nextButton.disabled = currentPage === pageCount;
+      nextButton.onclick = () => { changePage(currentPage + 1); };
+      wrapper.appendChild(nextButton);
+  }
+
+  function changePage(page) {
+      if (page < 1 || page > Math.ceil(jobData.length / rowsPerPage)) return;
+      currentPage = page;
+      updateTasks();
+  }
+
+  // --- ACTIONS ---
+  function updateStatus(sel, jobId){
+      const newSt = sel.value;
+      const job = jobData.find(j => j.id === jobId);
+      if (!job) return;
+
+      const prevStatus = job.status;
+      const prevIncomeCounted = job.incomeCounted === undefined ? true : job.incomeCounted;
+      lastChange = { type: 'updateStatus', jobId, prevStatus, newStatus: newSt, prevIncomeCounted };
+
+      let newIncomeCounted = prevIncomeCounted;
+      if(prevStatus !== "cancelled" && newSt === "cancelled") newIncomeCounted = false;
+      if(prevStatus === "cancelled" && newSt !== "cancelled") newIncomeCounted = true;
+
+      db.collection("jobs").doc(jobId).update({ status: newSt, incomeCounted: newIncomeCounted, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
+          .then(() => showToast("Job status updated successfully!"))
+          .catch(err => showToast("Error updating status.", true));
+  }
+
+  function updatePaidStatus(sel, jobId){
+      const newPaidStatus = sel.value;
+      const job = jobData.find(j => j.id === jobId);
+      if (!job) return;
+
+      const prevPaidStatus = job.paidStatus || 'unpaid';
+      lastChange = { type: 'updatePaidStatus', jobId, prevPaidStatus, newPaidStatus };
+
+      db.collection("jobs").doc(jobId).update({ paidStatus: newPaidStatus, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
+          .then(() => showToast("Payment status updated successfully!"))
+          .catch(err => showToast("Error updating payment status.", true));
+  }
+
+  function editJob(jobId) {
+      currentlyEditingJobId = jobId;
+      updateTasks();
+  }
+
+  function deleteJob(jobId) {
+      if (!confirm("Are you sure you want to delete this job permanently?")) return;
+      
+      const jobToDelete = jobData.find(j => j.id === jobId);
+      if (!jobToDelete) {
+          showToast("Could not find job to delete.", true);
+          return;
+      }
+      
+      db.collection("jobs").doc(jobId).delete()
+          .then(() => {
+              showToast("Job deleted successfully.");
+              lastChange = { type: 'delete', jobId: jobId, data: jobToDelete };
+          })
+          .catch(err => {
+              showToast("Error deleting job.", true);
+              console.error("Error deleting job: ", err);
+          });
+  }
+
+  function deleteExpense(expenseId) {
+      if (!confirm("Are you sure you want to delete this expense permanently?")) return;
+      
+      const expenseToDelete = expenseData.find(e => e.id === expenseId);
+      if (!expenseToDelete) {
+          showToast("Could not find expense to delete.", true);
+          return;
+      }
+
+      db.collection("expenses").doc(expenseId).delete()
+          .then(() => {
+              showToast("Expense deleted successfully.");
+              lastChange = { type: 'deleteExpense', expenseId: expenseId, data: expenseToDelete };
+          })
+          .catch(err => {
+              showToast("Error deleting expense.", true);
+              console.error("Error deleting expense: ", err);
+          });
+  }
+
+  function undoLastChange() {
+      if (!lastChange) {
+          showToast("No recent change to undo.", true);
+          return;
+      }
+
+      switch (lastChange.type) {
+          case 'add':
+              db.collection("jobs").doc(lastChange.jobId).delete().then(() => showToast("Job addition undone.")).catch(err => showToast("Error undoing job addition.", true));
+              break;
+          case 'addExpense':
+              db.collection("expenses").doc(lastChange.expenseId).delete().then(() => showToast("Expense addition undone.")).catch(err => showToast("Error undoing expense addition.", true));
+              break;
+          case 'updateStatus':
+               db.collection("jobs").doc(lastChange.jobId).update({ status: lastChange.prevStatus, incomeCounted: lastChange.prevIncomeCounted }).then(() => showToast("Status change undone.")).catch(err => showToast("Error undoing change.", true));
+              break;
+          case 'updatePaidStatus':
+              db.collection("jobs").doc(lastChange.jobId).update({ paidStatus: lastChange.prevPaidStatus }).then(() => showToast("Paid status change undone.")).catch(err => showToast("Error undoing change.", true));
+              break;
+          case 'delete':
+              db.collection("jobs").doc(lastChange.jobId).set(lastChange.data).then(() => showToast("Job deletion undone.")).catch(err => showToast("Error undoing deletion.", true));
+              break;
+          case 'deleteExpense':
+               db.collection("expenses").doc(lastChange.expenseId).set(lastChange.data).then(() => showToast("Expense deletion undone.")).catch(err => showToast("Error undoing deletion.", true));
+              break;
+          default:
+              showToast("Cannot undo this action.", true);
+              break;
+      }
+
+      lastChange = null;
+  }
+  
+  // --- REPORTING & CHARTS ---
+  function updateReports(){
+    const tb=document.getElementById("report-body");
+    tb.innerHTML="";
+    jobData.forEach(j=>{
+      if(j.incomeCounted !== false){
+        tb.innerHTML+=`<tr class="hover:bg-gray-50"><td class="border p-3 text-green-700">Income</td><td class="border p-3">${j.customer || ''}</td><td class="border p-3 font-semibold">Rs. ${(j.price-j.discount).toFixed(2)}</td><td class="border p-3">${j.orderDate || ''}</td></tr>`;
+      }
+    });
+    expenseData.forEach(e=>{
+      tb.innerHTML+=`<tr class="hover:bg-gray-50"><td class="border p-3 text-red-700">Expense</td><td class="border p-3">${e.title || ''}</td><td class="border p-3 font-semibold">Rs. ${e.amount.toFixed(2)}</td><td class="border p-3">${e.date || ''}</td></tr>`;
+    });
+  }
+    
+  function updateCharts() {
+      if (document.getElementById('reports').classList.contains('hidden')) return;
+      
+      const incomeCtx = document.getElementById('incomeExpenseChart').getContext('2d');
+      const monthlyData = {};
+
+      jobData.forEach(j => {
+          if (j.incomeCounted !== false && j.orderDate) {
+              const month = j.orderDate.substring(0, 7);
+              if (!monthlyData[month]) monthlyData[month] = { income: 0, expense: 0 };
+              monthlyData[month].income += (j.price - j.discount);
+          }
+      });
+
+      expenseData.forEach(e => {
+          if (e.date) {
+              const month = e.date.substring(0, 7);
+              if (!monthlyData[month]) monthlyData[month] = { income: 0, expense: 0 };
+              monthlyData[month].expense += e.amount;
+          }
+      });
+      
+      const sortedMonths = Object.keys(monthlyData).sort();
+      const labels = sortedMonths.map(month => new Date(month + '-02').toLocaleString('default', { month: 'short', year: 'numeric' }));
+      const incomeValues = sortedMonths.map(month => monthlyData[month].income);
+      const expenseValues = sortedMonths.map(month => monthlyData[month].expense);
+
+      if (incomeExpenseChart) incomeExpenseChart.destroy();
+      incomeExpenseChart = new Chart(incomeCtx, {
+          type: 'line',
+          data: {
+              labels: labels,
+              datasets: [
+                  { label: 'Income', data: incomeValues, borderColor: 'rgba(34, 197, 94, 1)', backgroundColor: 'rgba(34, 197, 94, 0.2)', fill: true, tension: 0.1 },
+                  { label: 'Expenses', data: expenseValues, borderColor: 'rgba(239, 68, 68, 1)', backgroundColor: 'rgba(239, 68, 68, 0.2)', fill: true, tension: 0.1 }
+              ]
+          }
+      });
+
+      const statusCtx = document.getElementById('jobStatusChart').getContext('2d');
+      if (jobStatusChart) jobStatusChart.destroy();
+      jobStatusChart = new Chart(statusCtx, {
+          type: 'pie',
+          data: {
+              labels: ['In Progress', 'Completed', 'Cancelled'],
+              datasets: [{
+                  label: 'Job Status',
+                  data: [stats.in_progress, stats.completed, stats.cancelled],
+                  backgroundColor: ['rgba(245, 158, 11, 1)', 'rgba(22, 163, 74, 1)', 'rgba(220, 38, 38, 1)'],
+                  hoverOffset: 4
+              }]
+          },
+          options: { responsive: true }
+      });
+  }
+
+  // --- DASHBOARD UPDATES ---
+  function updateDashboard(){
+    document.getElementById("stat-total").textContent   = stats.total;
+    document.getElementById("stat-progress").textContent= stats.in_progress;
+    document.getElementById("stat-completed").textContent= stats.completed;
+    document.getElementById("stat-cancelled").textContent= stats.cancelled;
+    document.getElementById("income-total").textContent = `Rs. ${totalIncome.toFixed(2)}`;
+    document.getElementById("expense-total").textContent= `Rs. ${totalExpenses.toFixed(2)}`;
+    document.getElementById("profit-total").textContent = `Rs. ${(totalIncome-totalExpenses).toFixed(2)}`;
+
+    const today = new Date().toISOString().split("T")[0];
+    const dueTodayCount = jobData.filter(job => job.status === 'in_progress' && job.deadline === today).length;
+    
+    const alertDiv = document.getElementById("due-today-alert");
+    const alertMessage = document.getElementById("due-today-message");
+    const alertCircle = document.getElementById("due-today-count-circle");
+
+    if (dueTodayCount > 0) {
+        alertMessage.textContent = `You have ${dueTodayCount} order(s) with a deadline of today.`;
+        alertCircle.textContent = dueTodayCount;
+        alertDiv.classList.remove("hidden");
+        alertCircle.classList.remove("hidden");
+    } else {
+        alertDiv.classList.add("hidden");
+        alertCircle.classList.add("hidden");
+    }
+  }
+    
+  function updateRecentActivity() {
+      const list = document.getElementById('recent-activity-list');
+      list.innerHTML = '';
+      const sortedJobs = [...jobData].sort((a, b) => (b.updatedAt?.toMillis() || 0) - (a.updatedAt?.toMillis() || 0));
+      const recentJobs = sortedJobs.slice(0, 5);
+      
+      if (recentJobs.length === 0) {
+          list.innerHTML = '<li class="text-gray-500">No recent activity.</li>';
+          return;
+      }
+
+      recentJobs.forEach(job => {
+          const li = document.createElement('li');
+          li.className = 'flex justify-between items-center bg-gray-50 p-2 rounded-md';
+          const statusClass = job.status === 'completed' ? 'text-green-600' : job.status === 'cancelled' ? 'text-red-600' : 'text-yellow-600';
+          li.innerHTML = `
+              <div>
+                  <p class="font-semibold">${job.customer}</p>
+                  <p class="text-xs text-gray-500">${job.details.substring(0, 30)}...</p>
+              </div>
+              <span class="font-bold text-xs capitalize ${statusClass}">${job.status.replace('_', ' ')}</span>
+          `;
+          list.appendChild(li);
+      });
+  }
+
+  function updateUpcomingDeadlines() {
+      const list = document.getElementById('upcoming-deadlines-list');
+      list.innerHTML = '';
+      const today = new Date();
+      today.setHours(0,0,0,0);
+
+      const upcoming = jobData
+          .filter(j => j.status === 'in_progress' && new Date(j.deadline) >= today)
+          .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
+          .slice(0, 5);
+
+      if (upcoming.length === 0) {
+          list.innerHTML = '<li class="text-gray-500">No upcoming deadlines.</li>';
+          return;
+      }
+
+      upcoming.forEach(job => {
+          const li = document.createElement('li');
+          li.className = 'flex justify-between items-center bg-gray-50 p-2 rounded-md';
+          li.innerHTML = `
+              <div>
+                  <p class="font-semibold">${job.customer}</p>
+                  <p class="text-xs text-gray-500">${job.phone}</p>
+              </div>
+              <span class="font-bold text-xs text-red-700">${job.deadline}</span>
+          `;
+          list.appendChild(li);
+      });
+  }
+    
+  // --- MISC FUNCTIONS ---
+  function printInvoice(jobId) {
+      const job = jobData.find(j => j.id === jobId);
+      if (!job) {
+          showToast('Could not find job details to print.', true);
+          return;
+      }
+
+      const total = (job.price || 0) - (job.discount || 0);
+
+      const invoiceHTML = `
+          <html>
+          <head>
+              <title>Invoice - ${job.customer}</title>
+              <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+              <style>
+                  body { font-family: 'Inter', sans-serif; }
+                  @media print {
+                      body { -webkit-print-color-adjust: exact; }
+                      .no-print { display: none; }
+                  }
+              </style>
+          </head>
+          <body class="bg-white">
+              <div class="p-8 max-w-2xl mx-auto">
+                  <div class="flex justify-between items-center pb-4 border-b">
+                      <div>
+                          <img src="LOGO.png" alt="INKSPIRE Logo" class="h-16">
+                          <p class="text-gray-600 text-sm">Your Company Address<br>City, Postal Code<br>Phone: (123) 456-7890</p>
+                      </div>
+                      <h1 class="text-4xl font-bold text-purple-700">INVOICE</h1>
+                  </div>
+                  <div class="grid grid-cols-2 gap-4 mt-8">
+                      <div>
+                          <h2 class="font-semibold text-gray-700">BILL TO:</h2>
+                          <p>${job.customer}</p>
+                          <p>${job.phone}</p>
+                          <p>${job.contact || ''}</p>
+                      </div>
+                      <div class="text-right">
+                          <p><span class="font-semibold">Invoice #:</span> ${job.id.substring(0, 8).toUpperCase()}</p>
+                          <p><span class="font-semibold">Order Date:</span> ${job.orderDate}</p>
+                          <p><span class="font-semibold">Deadline:</span> ${job.deadline}</p>
+                      </div>
+                  </div>
+                  <div class="mt-8">
+                      <table class="w-full">
+                          <thead class="bg-gray-100">
+                              <tr>
+                                  <th class="p-3 text-left font-semibold">Description</th>
+                                  <th class="p-3 text-right font-semibold">Amount</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr class="border-b">
+                                  <td class="p-3">${job.details}</td>
+                                  <td class="p-3 text-right">Rs. ${job.price.toFixed(2)}</td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  <div class="flex justify-end mt-4">
+                      <div class="w-full max-w-xs">
+                          <div class="flex justify-between">
+                              <span class="font-semibold">Subtotal:</span>
+                              <span>Rs. ${job.price.toFixed(2)}</span>
+                          </div>
+                          <div class="flex justify-between text-red-600">
+                              <span class="font-semibold">Discount:</span>
+                              <span>- Rs. ${job.discount.toFixed(2)}</span>
+                          </div>
+                          <div class="flex justify-between mt-2 pt-2 border-t-2 border-purple-700">
+                              <span class="font-bold text-lg">TOTAL:</span>
+                              <span class="font-bold text-lg">Rs. ${total.toFixed(2)}</span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="mt-16 text-center text-gray-500 text-sm">
+                      <p>Thank you for your business!</p>
+                      <button onclick="window.print()" class="no-print mt-4 bg-purple-600 text-white py-2 px-6 rounded-lg">Print</button>
+                  </div>
+              </div>
+          </body>
+          </html>
+      `;
+
+      const printWindow = window.open('', '', 'height=800,width=800');
+      printWindow.document.write(invoiceHTML);
+      printWindow.document.close();
+      printWindow.focus();
+  }
+
+  function updateTotalDisplay() {
+      const price = parseFloat(document.getElementById("price").value) || 0;
+      const discount = parseFloat(document.getElementById("discount").value) || 0;
+      document.getElementById("total-display").textContent = `Rs. ${(price - discount).toFixed(2)}`;
+  }
+  
+  function toggleDeliveryFields(type) {
+      document.getElementById("delivery-address").classList.add("hidden");
+      document.getElementById("delivery-email").classList.add("hidden");
+      document.getElementById("delivery-whatsapp").classList.add("hidden");
+      document.querySelector("#delivery-address input").value = "";
+      document.querySelector("#delivery-email input").value = "";
+      document.querySelector("#delivery-whatsapp input").value = "";
+      if (type === "address") document.getElementById("delivery-address").classList.remove("hidden");
+      else if (type === "email") document.getElementById("delivery-email").classList.remove("hidden");
+      else if (type === "whatsapp") document.getElementById("delivery-whatsapp").classList.remove("hidden");
+  }
+</script>
 </body>
 </html>
