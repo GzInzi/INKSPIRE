@@ -288,6 +288,20 @@
                 <span id="due-today-count-circle" class="alert-circle hidden">0</span>
             </div>
         </div>
+
+        <div id="unpaid-alert" class="hidden bg-red-100 border-l-4 border-red-500 text-red-800 p-4 mb-6 rounded-lg shadow-md" role="alert">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="py-1"><svg class="fill-current h-6 w-6 text-red-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 20C4.477 20 0 15.523 0 10S4.477 0 10 0s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V5h-2z"/></svg></div>
+                    <div>
+                        <p class="font-bold">💸 Unpaid Order Alert!</p>
+                        <p id="unpaid-message" class="text-sm">You have 0 orders that are unpaid for more than 5 days.</p>
+                        <a href="#" onclick="showSection('tasks')" class="text-red-700 text-sm underline hover:text-red-900">View Tasks</a>
+                    </div>
+                </div>
+                <span id="unpaid-count-circle" class="alert-circle bg-red-500 hidden">0</span>
+            </div>
+        </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
           <div class="dashboard-card bg-white p-5 shadow-md rounded-lg text-center border border-gray-100">
@@ -340,21 +354,61 @@
           
           <fieldset class="md:col-span-2 border border-gray-300 p-5 rounded-lg">
             <legend class="font-semibold text-gray-700 mb-3">Job Details <span class="text-red-500">*</span></legend>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Scanning" class="form-checkbox text-purple-600 rounded"> <span>Scanning</span></label>
-              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Laminating" class="form-checkbox text-purple-600 rounded"> <span>Laminating</span></label>
-              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Fax"       class="form-checkbox text-purple-600 rounded"> <span>Fax</span></label>
-              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Photocopy"class="form-checkbox text-purple-600 rounded"> <span>Photocopy</span></label>
-              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Business Card" class="form-checkbox text-purple-600 rounded"> <span>Business Card</span></label>
-              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Colour Printing" class="form-checkbox text-purple-600 rounded"> <span>Colour Printing</span></label>
-              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="B&W Printing"    class="form-checkbox text-purple-600 rounded"> <span>B&W Printing</span></label>
-              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Logo" class="form-checkbox text-purple-600 rounded"> <span>Logo</span></label>
-              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Sticker" class="form-checkbox text-purple-600 rounded"> <span>Sticker</span></label>
-              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Mug" class="form-checkbox text-purple-600 rounded"> <span>Mug</span></label>
-              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Key Tag" class="form-checkbox text-purple-600 rounded"> <span>Key Tag</span></label>
-              <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Other"            class="form-checkbox text-purple-600 rounded"> <span>Other</span></label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 text-sm">
+                
+                <div class="space-y-2">
+                    <h4 class="font-semibold text-gray-800 border-b pb-1">Printing & Finishing</h4>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Brochures / Flyers" class="form-checkbox text-purple-600 rounded"> <span>Brochures / Flyers</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Posters / Banners" class="form-checkbox text-purple-600 rounded"> <span>Posters / Banners</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Booklets" class="form-checkbox text-purple-600 rounded"> <span>Booklets</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Notepads" class="form-checkbox text-purple-600 rounded"> <span>Notepads</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Letterheads" class="form-checkbox text-purple-600 rounded"> <span>Letterheads</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Envelopes" class="form-checkbox text-purple-600 rounded"> <span>Envelopes</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Invitation Cards" class="form-checkbox text-purple-600 rounded"> <span>Invitation Cards</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Certificates" class="form-checkbox text-purple-600 rounded"> <span>Certificates</span></label>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-semibold text-gray-800 border-b pb-1">Custom Product Printing</h4>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="T-shirt Printing" class="form-checkbox text-purple-600 rounded"> <span>T-shirt Printing</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Cap Printing" class="form-checkbox text-purple-600 rounded"> <span>Cap Printing</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Calendar Printing" class="form-checkbox text-purple-600 rounded"> <span>Calendar Printing</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Badge/Button Printing" class="form-checkbox text-purple-600 rounded"> <span>Badge/Button Printing</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="ID Card Printing" class="form-checkbox text-purple-600 rounded"> <span>ID Card Printing</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Mobile Cover Printing" class="form-checkbox text-purple-600 rounded"> <span>Mobile Cover Printing</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Mug Printing" class="form-checkbox text-purple-600 rounded"> <span>Mug Printing</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Key Tag Printing" class="form-checkbox text-purple-600 rounded"> <span>Key Tag Printing</span></label>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-semibold text-gray-800 border-b pb-1">Office & Business Essentials</h4>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Invoice Books" class="form-checkbox text-purple-600 rounded"> <span>Invoice Books</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Receipt Books" class="form-checkbox text-purple-600 rounded"> <span>Receipt Books</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Presentation Folders" class="form-checkbox text-purple-600 rounded"> <span>Presentation Folders</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Menus" class="form-checkbox text-purple-600 rounded"> <span>Menus</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Wall Decals" class="form-checkbox text-purple-600 rounded"> <span>Wall Decals</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Window Stickers" class="form-checkbox text-purple-600 rounded"> <span>Window Stickers</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Roll-up Banners" class="form-checkbox text-purple-600 rounded"> <span>Roll-up Banners</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Display Boards" class="form-checkbox text-purple-600 rounded"> <span>Display Boards</span></label>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-semibold text-gray-800 border-b pb-1">Binding & Finishing</h4>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Spiral Binding" class="form-checkbox text-purple-600 rounded"> <span>Spiral Binding</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Wire Binding" class="form-checkbox text-purple-600 rounded"> <span>Wire Binding</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Thermal Binding" class="form-checkbox text-purple-600 rounded"> <span>Thermal Binding</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Saddle Stitching" class="form-checkbox text-purple-600 rounded"> <span>Saddle Stitching</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Die Cutting" class="form-checkbox text-purple-600 rounded"> <span>Die Cutting</span></label>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-semibold text-gray-800 border-b pb-1">🧑‍💻 Design & Digital Services</h4>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Graphic Design" class="form-checkbox text-purple-600 rounded"> <span>Graphic Design</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Logo Design" class="form-checkbox text-purple-600 rounded"> <span>Logo Design</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Resume/CV Design" class="form-checkbox text-purple-600 rounded"> <span>Resume/CV Design</span></label>
+                </div>
             </div>
-            <textarea id="other-details" placeholder="Other details." class="w-full mt-4 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"></textarea>
+            <textarea id="other-details" placeholder="Other details or services not listed above." class="w-full mt-4 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"></textarea>
           </fieldset>
 
           <div>
@@ -363,7 +417,7 @@
           </div>
           <div>
               <label for="discount" class="date-label">Discount (Rs)</label>
-              <input id="discount" type="number" required value="0" class="p-3 w-full border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+              <input id="discount" type="number" placeholder="e.g. 50" class="p-3 w-full border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
           </div>
 
           <p class="md:col-span-2 text-xl font-bold text-purple-700">Total: <span id="total-display">Rs. 0.00</span></p>
@@ -377,13 +431,19 @@
             <input id="deadline" type="date" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
           </div>
           
-          <div>
+          <div class="md:col-span-2">
             <label for="paid-status" class="date-label">Payment Status <span class="text-red-500">*</span></label>
-            <select id="paid-status" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
-                <option value="unpaid" selected>Unpaid</option>
+            <select id="paid-status" onchange="handlePaymentStatusChange()" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                <option value="" disabled selected>Select a Status</option>
+                <option value="unpaid">Unpaid</option>
                 <option value="paid">Paid</option>
                 <option value="partial">Partial</option>
             </select>
+          </div>
+
+          <div id="partial-payment-div" class="hidden md:col-span-2">
+            <label for="amount-paid" class="date-label">Amount Paid (Rs) <span class="text-red-500">*</span></label>
+            <input id="amount-paid" type="number" class="p-3 w-full border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
           </div>
 
           <fieldset class="md:col-span-2 border border-gray-300 p-5 rounded-lg">
@@ -757,6 +817,7 @@
         updateCharts();
         updateRecentActivity();
         updateUpcomingDeadlines();
+        updatePaymentReminders(); // Check for unpaid jobs
         if (calendar) calendar.render();
       }, err => console.error("Jobs listener error:", err));
 
@@ -783,22 +844,36 @@
         eventClick: function(info) {
             const jobId = info.event.id;
             if (jobId) {
-                showSection('tasks');
-                showToast(`Navigating to task for ${info.event.title}`);
+                viewTask(jobId);
             }
         }
       });
     }
   }
 
-  // --- FORM SUBMISSION HANDLERS ---
+  // --- FORM SUBMISSION & LOGIC ---
+  function handlePaymentStatusChange() {
+      const paymentStatus = document.getElementById('paid-status').value;
+      const partialPaymentDiv = document.getElementById('partial-payment-div');
+      const amountPaidInput = document.getElementById('amount-paid');
+
+      if (paymentStatus === 'partial') {
+          partialPaymentDiv.classList.remove('hidden');
+          amountPaidInput.required = true;
+      } else {
+          partialPaymentDiv.classList.add('hidden');
+          amountPaidInput.required = false;
+          amountPaidInput.value = ''; // Clear the value if user changes their mind
+      }
+  }
+
   function handleJobFormSubmit(e){
     e.preventDefault();
     const form = e.target;
     const customer = document.getElementById("customer").value.trim();
     const phone = document.getElementById("customer-phone").value.trim();
-    const price = parseFloat(document.getElementById("price").value)||0;
-    const discount = parseFloat(document.getElementById("discount").value)||0;
+    const price = parseFloat(document.getElementById("price").value) || 0;
+    const discount = parseFloat(document.getElementById("discount").value) || 0;
     
     if (!isFinite(price) || !isFinite(discount)) {
       showToast("Error: Price and Discount must be valid numbers.", true);
@@ -812,7 +887,7 @@
     }
     const detailValues = details.map(cb => cb.value);
 
-    const orderDate= document.getElementById("order-date").value;
+    const orderDate = document.getElementById("order-date").value;
     const deadline = document.getElementById("deadline").value;
     const paidStatus = document.getElementById("paid-status").value;
     
@@ -824,13 +899,34 @@
     if(delivery==="email")   contact=document.querySelector("#delivery-email input").value.trim();
     if(delivery==="whatsapp")contact=document.querySelector("#delivery-whatsapp input").value.trim();
 
-    const job={ customer, phone, contact, details:fullDetails, price, discount, orderDate, deadline, paidStatus, status:"in_progress", incomeCounted:true, createdAt: firebase.firestore.FieldValue.serverTimestamp(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+    let amountPaid = 0;
+    const totalPrice = price - discount;
+
+    if (paidStatus === 'paid') {
+        amountPaid = totalPrice;
+    } else if (paidStatus === 'partial') {
+        amountPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
+        if (amountPaid >= totalPrice || amountPaid <= 0) {
+            showToast("Error: Partial amount must be > 0 and < total price.", true);
+            return;
+        }
+    }
+    const amountRemaining = totalPrice - amountPaid;
+
+    const job = { 
+        customer, phone, contact, details:fullDetails, price, discount, 
+        orderDate, deadline, paidStatus, status:"in_progress", incomeCounted:true, 
+        amountPaid, amountRemaining,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(), 
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
+    };
     
     db.collection("jobs").add(job)
       .then((docRef)=> {
           showToast("Job added successfully!");
           form.reset();
-          document.getElementById("paid-status").value = "unpaid"; 
+          document.getElementById("paid-status").value = ""; 
+          handlePaymentStatusChange(); // Hide partial payment div after reset
           const today = new Date().toISOString().split("T")[0];
           document.getElementById("order-date").value = today;
           updateTotalDisplay();
@@ -908,11 +1004,11 @@
       if (job.status === "completed") statusTextColor = "text-green-800";
       else if (job.status === "cancelled") statusTextColor = "text-red-800";
 
-      let paidStatusTextColor = "text-gray-800";
+      let paidStatusBgColor = "bg-white text-gray-800";
       const jobPaidStatus = job.paidStatus || 'unpaid';
-      if (jobPaidStatus === "paid") paidStatusTextColor = "text-green-800 font-semibold";
-      else if (jobPaidStatus === "unpaid") paidStatusTextColor = "text-red-800 font-semibold";
-      else if (jobPaidStatus === "partial") paidStatusTextColor = "text-yellow-800 font-semibold";
+      if (jobPaidStatus === "paid") paidStatusBgColor = "bg-green-500 text-white font-semibold";
+      else if (jobPaidStatus === "unpaid") paidStatusBgColor = "bg-red-500 text-white font-semibold";
+      else if (jobPaidStatus === "partial") paidStatusBgColor = "bg-yellow-500 text-white font-semibold";
 
       row.innerHTML=`
         <td class="border p-3">${job.customer || ''}</td>
@@ -930,7 +1026,7 @@
           </select>
         </td>
         <td class="border p-3">
-          <select onchange="updatePaidStatus(this,'${job.id}')" class="p-2 border rounded-lg ${paidStatusTextColor}">
+          <select onchange="updatePaidStatus(this,'${job.id}')" class="p-2 border-0 rounded-lg ${paidStatusBgColor}">
             <option value="unpaid"${jobPaidStatus === "unpaid" ? " selected" : ""}>Unpaid</option>
             <option value="paid"${jobPaidStatus === "paid" ? " selected" : ""}>Paid</option>
             <option value="partial"${jobPaidStatus === "partial" ? " selected" : ""}>Partial</option>
@@ -998,6 +1094,32 @@
   }
 
   // --- ACTIONS ---
+  function viewTask(jobId) {
+      showSection('tasks');
+      setTimeout(() => { 
+          const allRows = document.querySelectorAll('#tasks-body tr');
+          allRows.forEach(row => row.classList.remove('bg-yellow-200', 'ring-2', 'ring-purple-500'));
+          let rowToHighlight = document.querySelector(`#tasks-body tr[data-job-id="${jobId}"]`);
+          if (rowToHighlight) {
+              rowToHighlight.classList.add('bg-yellow-200', 'ring-2', 'ring-purple-500');
+              rowToHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+              const jobIndex = jobData.findIndex(job => job.id === jobId);
+              if (jobIndex !== -1) {
+                  const pageNumber = Math.ceil((jobIndex + 1) / rowsPerPage);
+                  changePage(pageNumber);
+                  setTimeout(() => {
+                      rowToHighlight = document.querySelector(`#tasks-body tr[data-job-id="${jobId}"]`);
+                      if (rowToHighlight) {
+                          rowToHighlight.classList.add('bg-yellow-200', 'ring-2', 'ring-purple-500');
+                          rowToHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }
+                  }, 200);
+              }
+          }
+      }, 100);
+  }
+
   function updateStatus(sel, jobId){
       const newSt = sel.value;
       const job = jobData.find(j => j.id === jobId);
@@ -1069,8 +1191,8 @@
               lastChange = { type: 'deleteExpense', expenseId: expenseId, data: expenseToDelete };
           })
           .catch(err => {
-              showToast("Error deleting expense.", true);
               console.error("Error deleting expense: ", err);
+              showToast("Error deleting expense.", true);
           });
   }
 
@@ -1249,7 +1371,8 @@
 
       upcoming.forEach(job => {
           const li = document.createElement('li');
-          li.className = 'flex justify-between items-center bg-gray-50 p-2 rounded-md';
+          li.className = 'flex justify-between items-center bg-gray-50 p-2 rounded-md hover:bg-purple-100 cursor-pointer transition-colors';
+          li.setAttribute('onclick', `viewTask('${job.id}')`);
           li.innerHTML = `
               <div>
                   <p class="font-semibold">${job.customer}</p>
@@ -1259,6 +1382,35 @@
           `;
           list.appendChild(li);
       });
+  }
+
+  function updatePaymentReminders() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const fiveDaysAgo = new Date(today);
+      fiveDaysAgo.setDate(today.getDate() - 5);
+
+      const unpaidJobs = jobData.filter(job => {
+          if (job.paidStatus !== 'unpaid' || !job.orderDate) {
+              return false;
+          }
+          const orderDate = new Date(job.orderDate);
+          return orderDate < fiveDaysAgo;
+      });
+
+      const alertDiv = document.getElementById("unpaid-alert");
+      const alertMessage = document.getElementById("unpaid-message");
+      const alertCircle = document.getElementById("unpaid-count-circle");
+      
+      if (unpaidJobs.length > 0) {
+          alertMessage.textContent = `You have ${unpaidJobs.length} order(s) that are unpaid for more than 5 days.`;
+          alertCircle.textContent = unpaidJobs.length;
+          alertDiv.classList.remove("hidden");
+          alertCircle.classList.remove("hidden");
+      } else {
+          alertDiv.classList.add("hidden");
+          alertCircle.classList.add("hidden");
+      }
   }
     
   // --- MISC FUNCTIONS ---
@@ -1271,6 +1423,12 @@
 
       const total = (job.price || 0) - (job.discount || 0);
 
+      let finishedDateHTML = '';
+      if (job.status === 'completed' && job.updatedAt) {
+          const finishedDate = job.updatedAt.toDate().toISOString().split('T')[0];
+          finishedDateHTML = `<p><span class="font-semibold">Finished Date:</span> ${finishedDate}</p>`;
+      }
+
       const invoiceHTML = `
           <html>
           <head>
@@ -1281,6 +1439,9 @@
                   @media print {
                       body { -webkit-print-color-adjust: exact; }
                       .no-print { display: none; }
+                      h1, h2, p, span, th, td { color: black !important; }
+                      .text-purple-700, .text-red-600 { color: black !important; }
+                      .border-purple-700 { border-color: black !important; }
                   }
               </style>
           </head>
@@ -1289,7 +1450,7 @@
                   <div class="flex justify-between items-center pb-4 border-b">
                       <div>
                           <img src="LOGO.png" alt="INKSPIRE Logo" class="h-16">
-                          <p class="text-gray-600 text-sm">Your Company Address<br>City, Postal Code<br>Phone: (123) 456-7890</p>
+                          <p class="text-gray-600 text-sm mt-2">118,<br>New Road,<br>Dharga Town, 12090.</p>
                       </div>
                       <h1 class="text-4xl font-bold text-purple-700">INVOICE</h1>
                   </div>
@@ -1304,6 +1465,7 @@
                           <p><span class="font-semibold">Invoice #:</span> ${job.id.substring(0, 8).toUpperCase()}</p>
                           <p><span class="font-semibold">Order Date:</span> ${job.orderDate}</p>
                           <p><span class="font-semibold">Deadline:</span> ${job.deadline}</p>
+                          ${finishedDateHTML}
                       </div>
                   </div>
                   <div class="mt-8">
