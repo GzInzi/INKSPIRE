@@ -329,11 +329,17 @@
 <section id="job-order" class="hidden section-transition bg-white p-6 rounded-xl shadow-lg">
         <h2 class="text-2xl font-bold text-purple-700 mb-6">📝 New Job Order</h2>
         <form id="job-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-          <input id="customer"       type="text"     required placeholder="Customer Name" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
-          <input id="customer-phone" type="text"     required placeholder="Phone Number"  class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          <div>
+              <label for="customer" class="date-label">Customer Name <span class="text-red-500">*</span></label>
+              <input id="customer" type="text" required class="p-3 w-full border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          </div>
+          <div>
+              <label for="customer-phone" class="date-label">Phone Number <span class="text-red-500">*</span></label>
+              <input id="customer-phone" type="text" required class="p-3 w-full border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          </div>
           
           <fieldset class="md:col-span-2 border border-gray-300 p-5 rounded-lg">
-            <legend class="font-semibold text-gray-700 mb-3">Job Details</legend>
+            <legend class="font-semibold text-gray-700 mb-3">Job Details <span class="text-red-500">*</span></legend>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
               <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Scanning" class="form-checkbox text-purple-600 rounded"> <span>Scanning</span></label>
               <label class="flex items-center space-x-2"><input type="checkbox" name="details" value="Laminating" class="form-checkbox text-purple-600 rounded"> <span>Laminating</span></label>
@@ -351,21 +357,28 @@
             <textarea id="other-details" placeholder="Other details." class="w-full mt-4 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"></textarea>
           </fieldset>
 
-          <input id="price"    type="number" required placeholder="Price (Rs)"    class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
-          <input id="discount" type="number" required placeholder="Discount (Rs)" class="p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          <div>
+              <label for="price" class="date-label">Price (Rs) <span class="text-red-500">*</span></label>
+              <input id="price" type="number" required class="p-3 w-full border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          </div>
+          <div>
+              <label for="discount" class="date-label">Discount (Rs)</label>
+              <input id="discount" type="number" required value="0" class="p-3 w-full border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+          </div>
+
           <p class="md:col-span-2 text-xl font-bold text-purple-700">Total: <span id="total-display">Rs. 0.00</span></p>
 
           <div>
-            <label for="order-date" class="date-label">Order Date</label>
-            <input id="order-date" type="date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+            <label for="order-date" class="date-label">Order Date <span class="text-red-500">*</span></label>
+            <input id="order-date" type="date" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
           </div>
           <div>
-            <label for="deadline" class="date-label">Deadline</label>
+            <label for="deadline" class="date-label">Deadline <span class="text-red-500">*</span></label>
             <input id="deadline" type="date" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
           </div>
           
           <div>
-            <label for="paid-status" class="date-label">Payment Status</label>
+            <label for="paid-status" class="date-label">Payment Status <span class="text-red-500">*</span></label>
             <select id="paid-status" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
                 <option value="unpaid" selected>Unpaid</option>
                 <option value="paid">Paid</option>
@@ -674,7 +687,7 @@
       if (id === "reports") updateCharts();
 
       // Hide sidebar on mobile after navigation
-      if (window.innerWidth < 768) {
+      if (window.innerWidth < 768 && !document.getElementById('sidebar').classList.contains('-translate-x-full')) {
           toggleSidebar();
       }
   }
@@ -792,12 +805,19 @@
       return;
     }
 
+    const details = [...document.querySelectorAll('input[name="details"]:checked')];
+    if (details.length === 0) {
+        showToast("Error: Please select at least one Job Detail.", true);
+        return;
+    }
+    const detailValues = details.map(cb => cb.value);
+
     const orderDate= document.getElementById("order-date").value;
     const deadline = document.getElementById("deadline").value;
     const paidStatus = document.getElementById("paid-status").value;
-    const details = [...document.querySelectorAll('input[name="details"]:checked')].map(cb=>cb.value);
+    
     const other = document.getElementById("other-details").value.trim();
-    const fullDetails=[...details, other?`Other: ${other}`:''].filter(Boolean).join(", ");
+    const fullDetails=[...detailValues, other?`Other: ${other}`:''].filter(Boolean).join(", ");
     const delivery = document.querySelector('input[name="delivery"]:checked')?.value;
     let contact="";
     if(delivery==="address") contact=document.querySelector("#delivery-address input").value.trim();
